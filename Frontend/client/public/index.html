@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MovieNight - Track and manage your movie watching experience">
+    <meta name="theme-color" content="#212529">
+    <title>FlickPicker - Movie Night Tracking Application</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Security headers -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' cdn.jsdelivr.net fonts.googleapis.com fonts.gstatic.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com;">
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css" as="style">
+    
+    <!-- Stylesheets with SRI -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        integrity="sha256-PI8n5gCcz9cQqQXm3PEtDuPG8qx9oFsFctPg0S5zb8g=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/all.min.css"
+        integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+    <link rel="preconnect" href="fonts.googleapis.com">
+    <link rel="preconnect" href="fonts.gstatic.com">
+    <link rel="stylesheet" href="./styles.css">
+    
+    <!-- Web app manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/favicon.png">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
+          <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+              <div class="brand-container d-flex align-items-center">
+                <img src="/logo.svg" alt="" width="30" height="24" class="brand-logo">
+                <span class="brand-text ms-2">FlickPicker</span>
+              </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarContent" aria-controls="navbarContent"
+              aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+              <div class="ms-auto d-flex align-items-center">
+                <!-- Search Form -->
+                <form class="d-flex me-3" role="search" onsubmit="return false;">
+                  <div class="input-group">
+                    <input class="form-control" type="search" placeholder="Search movies..."
+                      aria-label="Search movies" required minlength="2"
+                      id="movieSearch" autocomplete="off">
+                    <button class="btn btn-outline-success" type="submit">
+                      <i class="fas fa-search" aria-hidden="true"></i>
+                      <span class="visually-hidden">Search</span>
+                    </button>
+                  </div>
+                </form>
+                <!-- Authentication Buttons -->
+                <div id="auth-buttons">
+                  <button class="btn btn-outline-light" type="button" data-bs-toggle="modal"
+                    data-bs-target="#loginModal" id="loginButton">
+                    <i class="fas fa-user" aria-hidden="true"></i>
+                    <span>Login</span>
+                  </button>
+                  <div class="dropdown d-none" id="userMenu">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button"
+                      id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="fas fa-user" aria-hidden="true"></i>
+                      <span class="username">User</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                      <li><a class="dropdown-item" href="#" id="profileLink">
+                          <i class="fa fa-user-circle" aria-hidden="true"></i> Profile
+                        </a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="#" id="settingsLink">
+                          <i class="fas fa-cog" aria-hidden="true"></i> Settings
+                        </a></li>
+                      <li><button class="dropdown-item" type="button" id="logoutLink">
+                          <i class="fa fa-sign-out-alt" aria-hidden="true"></i> Logout
+                        </button></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
+    </header>
+    <main>
+        <section id="filter-section">
+            <h2>Filter Movies</h2>
+            <select id="genre-filter">
+                <option value="">All Genres</option>
+                <option value="action">Action</option>
+                <option value="adventure">Adventure</option>
+                <option value="comedy">Comedy</option>
+                <option value="drama">Drama</option>
+                <option value="fantasy">Fantasy</option>
+                <option value="horror">Horror</option>
+                <option value="romance">Romance</option>
+                <option value="sci-fi">Science Fiction</option>
+                <option value="thriller">Thriller</option>
+                <option value="animation">Animation</option>
+                <option value="documentary">Documentary</option>
+                <option value="mystery">Mystery</option>
+                <option value="biography">Biography</option>
+                <option value="historical">Historical</option>
+            </select>
+            <select id="year-filter">
+                <option value="">All Years</option>
+                <!-- Options will be populated dynamically -->
+            </select>
+            <select id="sort-order">
+                <option value="title">Title</option>
+                <option value="year">Year</option>
+                <option value="runtime">Runtime</option>
+            </select>
+            <select id="rating-filter">
+                <option value="">All Ratings</option>
+                <option value="G">G</option>
+                <option value="PG">PG</option>
+                <option value="PG-13">PG-13</option>
+                <option value="R">R</option>
+                <option value="NC-17">NC-17</option>
+            </select>
+            <select id="director-filter">
+                <option value="">All Directors</option>
+                <!-- Options will be populated dynamically -->
+            </select>
+            <select id="cast-member-filter">
+                <option value="">All Cast Members</option>
+                <!-- Options will be populated dynamically -->
+            </select>
+            <!-- Add more filters as needed -->
+        </section>
+        
+        <section id="movie-list" aria-label="Movie list">
+            <div class="movies-header mb-4 mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        <button class="btn btn-primary me-2" type="button" data-bs-toggle="modal" 
+                                data-bs-target="#addMovieModal" aria-label="Add new movie">
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add Movie
+                        </button>
+                        <button class="btn btn-outline-primary" type="button" id="layout-toggle" 
+                                aria-label="Toggle view layout">
+                            <i class="fas fa-list-ul" aria-hidden="true"></i>
+                            <span>List View</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="movie-grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                <!-- Movies will be dynamically inserted here -->
+            </div>
+    </main>
+    <footer class="footer mt-auto py-3 bg-dark text-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <a href="/" class="text-light text-decoration-none">
+                        <img src="/logo.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                    </a>
+                    <small class="d-block mt-2">&copy; 2024 MovieNight. All rights reserved.</small>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/about" class="text-light">About</a></li>
+                        <li><a href="/privacy" class="text-light">Privacy Policy</a></li>
+                        <li><a href="/terms" class="text-light">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Follow Us</h5>
+                    <div class="social-links">
+                        <a href="#" class="text-light me-2" aria-label="Discord">
+                            <i class="fab fa-discord" aria-hidden="true"></i>
+                        </a>
+                        <!-- Other social links -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="modal fade" id="addMovieModal" tabindex="-1" aria-labelledby="addMovieModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMovieModalLabel">Add Movie</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-movie-form">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="dateWatched" class="form-label">Date Watched</label>
+                                <input type="date" class="form-control" id="dateWatched" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="year" class="form-label">Year</label>
+                                <input type="number" class="form-control" id="year" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="category" class="form-label">Category</label>
+                                <input type="text" class="form-control" id="category" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="trailerLink" class="form-label">Trailer Link</label>
+                                <input type="url" class="form-control" id="trailerLink" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="movieLink" class="form-label">Movie Link</label>
+                                <input type="url" class="form-control" id="movieLink" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="modernTrailerLink" class="form-label">Modern Trailer Link</label>
+                                <input type="url" class="form-control" id="modernTrailerLink" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-4">
+                                <label for="requestedBy" class="form-label">Requested By</label>
+                                <input type="text" class="form-control" id="requestedBy" required>
+                            </div>
+                            <div class="col-4">
+                                <label for="language" class="form-label">Language</label>
+                                <input type="text" class="form-control" id="language" required>
+                            </div>
+                            <div class="col-4">
+                                <label for="subtitles" class="form-label">Subtitles</label>
+                                <select class="form-select" id="subtitles" required>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="imdbLink" class="form-label">IMDB Link</label>
+                                <input type="url" class="form-control" id="imdbLink" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="tmdbLink" class="form-label">TMDB Link</label>
+                                <input type="url" class="form-control" id="tmdbLink" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submitMovieBtn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" required>
+                                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                    <i class="fas fa-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="loginBtn">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">User Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="profile-info">
+                        <!-- User profile information will be populated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="searchProfilesModal" tabindex="-1" aria-labelledby="searchProfilesModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="searchProfilesModalLabel">Search Profiles</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="searchQuery" class="form-control" placeholder="Enter username or email">
+                    <button type="button" id="searchBtn" class="btn btn-primary mt-2">Search</button>
+                    <div id="searchResults" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Settings</li>
+                    </ul>
+                    
+                    <h6 class="mt-3">Notifications</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                        <label class="form-check-label" for="emailNotifications">Email Notifications</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="discordNotifications">
+                        <label class="form-check-label" for="discordNotifications">Discord Notifications</label>
+                    </div>
+                    
+                    <h6 class="mt-3">Voting Preferences</h6>
+                    <div class="mb-3">
+                        <label for="voteLimit" class="form-label">Maximum Votes Per User</label>
+                        <input type="number" class="form-control" id="voteLimit" value="3" min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="votingDeadline" class="form-label">Voting Deadline</label>
+                        <input type="datetime-local" class="form-control" id="votingDeadline">
+                    </div>
+    
+                    <h6 class="mt-3">Theme</h6>
+                    <div class="mb-3">
+                        <label for="themeSelector" class="form-label">Choose App Theme</label>
+                        <select class="form-select" id="themeSelector">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                        </select>
+                    </div>
+    
+                    <h6 class="mt-3">Feedback</h6>
+                    <div class="mb-3">
+                        <label for="feedback" class="form-label">Your Feedback</label>
+                        <textarea class="form-control" id="feedback" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveSettingsBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/popper.min.js"
+        integrity="sha256-O17BxFKtTt1tzzlkcYwgONw4K59H+r1iI8mSQXvSf5k=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.js"
+        integrity="sha256-mkoRoV24jV+rCPWcHDR5awPx8VuzzJKN0ibhxZ9/WaM=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/js/all.min.js"
+        integrity="sha256-qq1ob4lpAizCQs1tkv5gttMXUlgpiHyvG3JcCIktRvs=" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
+</html>

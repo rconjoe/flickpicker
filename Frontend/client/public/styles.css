@@ -1,0 +1,178 @@
+/* Global Variables */
+:root {
+    --primary-color: #5B2E91;
+    --secondary-color: #3F1B68;
+    --text-light: #ffffff;
+    --text-dark: #212529;
+    --card-bg: #ffffff;
+    --transition-speed: 0.3s;
+  }
+  
+  /* Base Styles */
+  body {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-bottom: 60px;
+  }
+  
+  /* Header & Navigation */
+  header, nav {
+    background-color: var(--secondary-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-brand img {
+    transition: transform var(--transition-speed);
+  }
+  
+  .navbar-brand:hover img {
+    transform: scale(1.1);
+  }
+  
+  /* Main Content */
+  main {
+    flex: 1;
+    padding: 2rem 1rem;
+  }
+  
+  /* Movie Grid */
+  #movie-grid {
+    gap: 1.5rem;
+    padding-top: 0.5rem;
+  }
+  
+  .movies-header .btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+  }
+
+  .movies-header .btn-group {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .card {
+    background: var(--card-bg);
+    transition: transform var(--transition-speed);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-img-top {
+    height: 300px;
+    object-fit: cover;
+  }
+  
+  /* Filter Section */
+  #filter-section {
+    background: var(--secondary-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+  
+  #filter-section select {
+    margin: 0.5rem;
+    min-width: 150px;
+  }
+  
+  /* Footer */
+  footer {
+    background-color: var(--secondary-color);
+    padding: 1rem 0;
+    margin-top: auto;
+  }
+  
+  footer a {
+    transition: color var(--transition-speed);
+  }
+  
+  footer a:hover {
+    color: #a991cc !important;
+  }
+  
+  /* Modal Styles */
+  .modal-content {
+    background: var(--card-bg);
+    border-radius: 8px;
+  }
+  
+  .modal-header {
+    background: var(--secondary-color);
+    color: var(--text-light);
+    border-radius: 8px 8px 0 0;
+  }
+  
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    #filter-section select {
+      width: 100%;
+      margin: 0.5rem 0;
+    }
+    
+    .card {
+      margin: 0 auto;
+    }
+
+    .movies-header {
+      padding: 0.75rem;
+    }
+  
+    .movies-header .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+  }
+  
+  /* Loading Animation */
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  /* Navigation Specific Styles */
+.navbar {
+    padding: 0.5rem 1rem;
+  }
+  
+  .navbar-brand {
+    padding: 0;
+    margin-right: 1rem;
+  }
+  
+  .brand-container {
+    gap: 0.5rem;
+  }
+  
+  .brand-logo {
+    display: block;
+    height: 24px;
+    width: auto;
+    object-fit: contain;
+  }
+  
+  .brand-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-light);
+    white-space: nowrap;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .navbar-brand {
+      margin-right: 0;
+    }
+    
+    .brand-container {
+      gap: 0.25rem;
+    }
+  }
