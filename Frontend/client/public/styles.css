@@ -102,6 +102,7 @@
   .modal-content {
     background: var(--card-bg);
     border-radius: 8px;
+    color: var(--text-dark); /* Ensures dark text in modal content */
   }
   
   .modal-header {
@@ -110,6 +111,51 @@
     border-radius: 8px 8px 0 0;
   }
   
+  .modal-body {
+    color: var(--text-dark); /* Reinforces dark text in modal body */
+  }
+
+  /* Form Labels and Text in Modals */
+  .modal-body label {
+      color: var(--text-dark);
+  }
+
+  .modal-body .form-label {
+      color: var(--text-dark);
+  }
+
+  /* Ensure other text elements in modals are visible */
+  .modal-body .form-text {
+      color: #6c757d; /* Bootstrap's text-muted color */
+  }
+
+  /* If you have any custom text classes in modals */
+  .modal-body .text-muted {
+      color: #6c757d !important;
+  }
+
+  /* Breadcrumb styling in modals */
+  .modal-body .breadcrumb {
+      color: var(--text-dark);
+  }
+
+  .modal-body .breadcrumb-item {
+      color: var(--text-dark);
+  }
+
+  .modal-body .breadcrumb-item.active {
+      color: #6c757d;
+  }
+
+  /* Form check labels in modals */
+  .modal-body .form-check-label {
+      color: var(--text-dark);
+  }
+
+  /* Modal footer */
+  .modal-footer {
+      border-top-color: #dee2e6;
+  }
 
   /* Responsive Design */
   @media (max-width: 768px) {
