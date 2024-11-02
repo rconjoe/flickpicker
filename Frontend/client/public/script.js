@@ -251,3 +251,17 @@ function updateAuthUI() {
         userMenu.classList.add('d-none');
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the settings link element
+    const settingsLink = document.getElementById('settingsLink');
+    
+    if (settingsLink) {
+        settingsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Get the modal through bootstrap's constructor
+            const settingsModal = new window.bootstrap.Modal(document.getElementById('settingsModal'));
+            settingsModal.show();
+        });
+    }
+});
