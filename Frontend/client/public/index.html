@@ -305,12 +305,212 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="profile-info">
-                        <!-- User profile information will be populated here -->
+                    <!-- Profile Header -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="profile-avatar me-3">
+                            <div class="rounded-circle bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                <i class="fas fa-user fa-3x text-secondary"></i>
+                            </div>
+                        </div>
+                        <div class="profile-info">
+                            <h4 class="mb-1" id="profileUsername">MovieBuff2024</h4>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                Member since <span id="profileJoinDate">January 2024</span>
+                            </p>
+                        </div>
+                    </div>
+    
+                    <!-- Navigation Tabs -->
+                    <ul class="nav nav-tabs mb-3" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                                Overview
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab">
+                                Stats
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="preferences-tab" data-bs-toggle="tab" data-bs-target="#preferences" type="button" role="tab">
+                                Preferences
+                            </button>
+                        </li>
+                    </ul>
+    
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="profileTabContent">
+                        <!-- Overview Tab -->
+                        <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                            <div class="row g-3">
+                                <!-- Movies Watched Card -->
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-subtitle mb-2">
+                                                <i class="fas fa-film me-2"></i>Movies Watched
+                                            </h6>
+                                            <p class="card-text display-6" id="moviesWatchedCount">142</p>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- Voting Streak Card -->
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-subtitle mb-2">
+                                                <i class="fas fa-star me-2"></i>Voting Streak
+                                            </h6>
+                                            <p class="card-text display-6" id="votingStreak">8</p>
+                                            <p class="text-muted">weeks</p>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- Favorite Genres Card -->
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-subtitle mb-2">
+                                                <i class="fas fa-heart me-2"></i>Favorite Genres
+                                            </h6>
+                                            <div class="d-flex flex-wrap gap-2" id="favoriteGenres">
+                                                <span class="badge bg-primary">Sci-Fi</span>
+                                                <span class="badge bg-primary">Thriller</span>
+                                                <span class="badge bg-primary">Animation</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- Movie Night Activity Card -->
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-subtitle mb-2">
+                                                <i class="fas fa-users me-2"></i>Movie Night Activity
+                                            </h6>
+                                            <p class="mb-1">Last attended: <span id="lastAttended">Yesterday</span></p>
+                                            <p class="mb-0">Hosting next: <span id="nextHosting">Friday 8 PM</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!-- Stats Tab -->
+                        <div class="tab-pane fade" id="stats" role="tabpanel">
+                            <!-- Watching Statistics -->
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Watching Statistics</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <p class="mb-2 d-flex justify-content-between">
+                                                <span>Movies Completed:</span>
+                                                <strong id="moviesCompleted">142</strong>
+                                            </p>
+                                            <p class="mb-2 d-flex justify-content-between">
+                                                <span>Movies Voted On:</span>
+                                                <strong id="moviesVoted">256</strong>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-2 d-flex justify-content-between">
+                                                <span>Movies Suggested:</span>
+                                                <strong id="moviesSuggested">45</strong>
+                                            </p>
+                                            <p class="mb-2 d-flex justify-content-between">
+                                                <span>Total Watch Time:</span>
+                                                <strong id="totalWatchTime">284 hours</strong>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <!-- Achievements -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Achievements</h6>
+                                    <div class="row g-3" id="achievementsList">
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-award text-warning me-2"></i>
+                                                <span>Movie Marathon Master</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-award text-primary me-2"></i>
+                                                <span>Perfect Attendance</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!-- Preferences Tab -->
+                        <div class="tab-pane fade" id="preferences" role="tabpanel">
+                            <!-- Watching Preferences -->
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-cog me-2"></i>Watching Preferences
+                                    </h6>
+                                    <div class="mb-3">
+                                        <p class="fw-bold mb-1">Preferred Languages</p>
+                                        <div class="d-flex flex-wrap gap-2" id="preferredLanguages">
+                                            <span class="badge bg-secondary">English</span>
+                                            <span class="badge bg-secondary">Japanese</span>
+                                            <span class="badge bg-secondary">Korean</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p class="fw-bold mb-1">Subtitle Preference</p>
+                                        <p id="subtitlePreference">Always</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p class="fw-bold mb-1">Preferred Viewing Time</p>
+                                        <p id="viewingTime">Evening (8-11 PM)</p>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <!-- Notification Settings -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Movie Night Settings</h6>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="notifyNewMovies" checked>
+                                        <label class="form-check-label" for="notifyNewMovies">
+                                            Notify me about new movie suggestions
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="notifyVoting" checked>
+                                        <label class="form-check-label" for="notifyVoting">
+                                            Remind me when voting closes
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="shareHistory" checked>
+                                        <label class="form-check-label" for="shareHistory">
+                                            Share my watching history with group
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
                 </div>
             </div>
         </div>
