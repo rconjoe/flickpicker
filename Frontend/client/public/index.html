@@ -48,16 +48,24 @@
               <div class="ms-auto d-flex align-items-center">
                 <!-- Search Form -->
                 <form class="d-flex me-3" role="search" onsubmit="return false;">
-                  <div class="input-group">
-                    <input class="form-control" type="search" placeholder="Search movies..."
-                      aria-label="Search movies" required minlength="2"
-                      id="movieSearch" autocomplete="off">
-                    <button class="btn btn-outline-success" type="submit">
-                      <i class="fas fa-search" aria-hidden="true"></i>
-                      <span class="visually-hidden">Search</span>
-                    </button>
-                  </div>
-                </form>
+                    <div class="input-group">
+                      <label for="movieSearch" class="visually-hidden">Search for movies</label>
+                      <input 
+                        class="form-control" 
+                        type="search" 
+                        placeholder="Search movies..." 
+                        aria-label="Search movies"
+                        id="movieSearch"
+                        name="movieSearch"
+                        required 
+                        minlength="2"
+                        autocomplete="off">
+                      <button class="btn btn-outline-success" type="submit">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <span class="visually-hidden">Search</span>
+                      </button>
+                    </div>
+                  </form>
                 <!-- Authentication Buttons -->
                 <div id="auth-buttons">
                   <button class="btn btn-outline-light" type="button" data-bs-toggle="modal"
