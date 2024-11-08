@@ -414,6 +414,109 @@ class UserProfile {
 // Initialize UserProfile class
 const userProfile = new UserProfile();
 
+document.getElementById('submitMovieBtn').addEventListener('click', handleAddMovie);
+
+async function handleAddMovie(event) {
+    event.preventDefault();
+
+    // Gather data from the modal form
+    const movieData = {
+        id: Date.now(), // Generate unique ID
+        title: document.getElementById('title').value,
+        dateWatched: document.getElementById('dateWatched').value,
+        watched: false,
+        year: parseInt(document.getElementById('year').value),
+        category: document.getElementById('category').value,
+        trailerLink: document.getElementById('trailerLink').value,
+        movieLink: document.getElementById('movieLink').value,
+        modernTrailerLink: document.getElementById('modernTrailerLink').value,
+        requestedBy: {
+            userId: state.currentUser?.id || 'anonymous',
+            username: document.getElementById('requestedBy').value,
+            platform: 'Web'
+        },
+        language: document.getElementById('language').value,
+        subtitles: document.getElementById('subtitles').value === 'true',
+        voteCount: 0,
+        imageUrl: './img/placeholder-movie.jpg', // Default image
+        runtime: "", // You might want to add this to your form
+        ratings: "",
+        trailerPrivate: false,
+        moviePrivate: false
+    };
+
+    try {
+        // Validate the data before sending (optional)
+        if (!validateMovieData(movieData)) {
+            throw new Error('Invalid movie data');
+        }
+
+        // Send the POST request to add the movie
+        const response = await fetch('http://localhost:3000/add-movie', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(movieData),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to add movie');
+        }
+
+        // If successful, update the frontend
+        state.movies.push(movieData);
+        state.filteredMovies = [...state.movies];
+        updateMovieDisplay(); // Assuming this updates the movie list in your UI
+
+        // Close the modal
+        const modal = window.bootstrap.Modal.getInstance(document.getElementById('addMovieModal'));
+        modal.hide();
+
+        // Show success message (can be done with a toast or alert)
+        showToast('Movie added successfully!', 'success');
+
+        // Reset the form
+        document.getElementById('add-movie-form').reset();
+    } catch (error) {
+        console.error('Error adding movie:', error);
+        showToast('Failed to add movie. Please try again.', 'error');
+    }
+}
+
+// Helper function to show success/error messages (you may already have one)
+function showToast(message, type) {
+    const toast = new window.bootstrap.Toast(document.getElementById('liveToast'));
+    const toastBody = document.querySelector('.toast-body');
+    toastBody.textContent = message;
+    toast.show();
+}
+
+
+function validateMovieData(data) {
+    return (
+        data.title?.trim() &&
+        data.year > 1800 && data.year <= new Date().getFullYear() &&
+        data.requestedBy?.username?.trim() &&
+        isValidUrl(data.trailerLink) &&
+        isValidUrl(data.movieLink) &&
+        isValidUrl(data.modernTrailerLink)
+    );
+}
+
+function isValidUrl(string) {
+    if (!string) return true; // Allow empty strings
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
+// Add event listener for form submission
+document.getElementById('submitMovieBtn').addEventListener('click', handleAddMovie);
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
       try {

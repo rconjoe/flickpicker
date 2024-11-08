@@ -142,5 +142,101 @@
         "imageUrl": "./img/movie1.jpg",
         "runtime": "2h22m",
         "ratings": ""
+    },
+    {
+        "id": 7,
+        "title": "",
+        "dateWatched": "",
+        "watched": false,
+        "trailerLink": "",
+        "movieLink": "",
+        "modernTrailerLink": "",
+        "requestedBy": {
+            "userId": "",
+            "username": "",
+            "platform": ""
+        },
+        "category": "",
+        "trailerPrivate": false,
+        "moviePrivate": false,
+        "year": 0,
+        "subtitles": true,
+        "language": "",
+        "voteCount": 0,
+        "imageUrl": "./img/movie7.jpg",
+        "runtime": "",
+        "ratings": ""
+    },
+    {
+        "id": 8,
+        "title": "",
+        "dateWatched": "",
+        "watched": false,
+        "trailerLink": "",
+        "movieLink": "",
+        "modernTrailerLink": "",
+        "requestedBy": {
+            "userId": "",
+            "username": "",
+            "platform": ""
+        },
+        "category": "",
+        "trailerPrivate": false,
+        "moviePrivate": false,
+        "year": 0,
+        "subtitles": true,
+        "language": "",
+        "voteCount": 0,
+        "imageUrl": "./img/movie8.jpg",
+        "runtime": "",
+        "ratings": ""
+    },
+    {
+        "id": 9,
+        "title": "",
+        "dateWatched": "",
+        "watched": false,
+        "trailerLink": "",
+        "movieLink": "",
+        "modernTrailerLink": "",
+        "requestedBy": {
+            "userId": "",
+            "username": "",
+            "platform": ""
+        },
+        "category": "",
+        "trailerPrivate": false,
+        "moviePrivate": false,
+        "year": 0,
+        "subtitles": true,
+        "language": "",
+        "voteCount": 0,
+        "imageUrl": "./img/movie9.jpg",
+        "runtime": "",
+        "ratings": ""
+    },
+    {
+        "id": 10,
+        "title": "",
+        "dateWatched": "",
+        "watched": false,
+        "trailerLink": "",
+        "movieLink": "",
+        "modernTrailerLink": "",
+        "requestedBy": {
+            "userId": "",
+            "username": "",
+            "platform": ""
+        },
+        "category": "",
+        "trailerPrivate": false,
+        "moviePrivate": false,
+        "year": 0,
+        "subtitles": true,
+        "language": "",
+        "voteCount": 0,
+        "imageUrl": "./img/movie10.jpg",
+        "runtime": "",
+        "ratings": ""
     }
 ]

@@ -21,9 +21,18 @@ const dbVersion = 1;
 // Install event handler
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(ASSETS_TO_CACHE))
-      .catch((error) => console.error('Cache installation failed:', error))
+    Promise.all(ASSETS_TO_CACHE.map(url => {
+      return fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.status}`);
+          }
+          return caches.open(CACHE_NAME).then(cache => cache.put(url, response));
+        })
+        .catch((error) => {
+          console.error('Error caching asset:', error);
+        });
+    }))
   );
 });
 
