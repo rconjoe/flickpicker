@@ -163,6 +163,32 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchMovies();
     loadUserFromSession();
     initializeEventListeners();
+    
+    // Add playlist initialization
+    initializePlaylist();
+    initializePlaylistUI();
+    
+    // Get the settings link element
+    const settingsLink = document.getElementById('settingsLink');
+    
+    if (settingsLink) {
+        settingsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Get the modal through bootstrap's constructor
+            const settingsModal = new window.bootstrap.Modal(document.getElementById('settingsModal'));
+            settingsModal.show();
+        });
+    }
+
+    const profileLink = document.getElementById('profileLink');
+    
+    if (profileLink) {
+        profileLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            const profileModal = new window.bootstrap.Modal(document.getElementById('profileModal'));
+            profileModal.show();
+        });
+    }
 });
 
 function handleMovieInteraction(event) {
@@ -669,4 +695,4 @@ if ('serviceWorker' in navigator) {
         console.error('Service Worker registration failed:', error);
       }
     });
-  }
+}
