@@ -723,3 +723,27 @@ if ('serviceWorker' in navigator) {
       }
     });
 }
+
+document.getElementById('saveSettingsBtn').addEventListener('click', function() {
+    // Capture the values from the modal
+    const emailNotifications = document.getElementById('emailNotifications').checked;
+    const discordNotifications = document.getElementById('discordNotifications').checked;
+    const voteLimit = document.getElementById('voteLimit').value;
+    const votingDeadline = document.getElementById('votingDeadline').value;
+    const theme = document.getElementById('themeSelector').value;
+    const feedback = document.getElementById('feedback').value;
+
+    // Log the values (you could send this data to your server or store it locally)
+    console.log({
+      emailNotifications,
+      discordNotifications,
+      voteLimit,
+      votingDeadline,
+      theme,
+      feedback
+    });
+
+    // Optionally close the modal after saving
+    const modal = window.bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
+    modal.hide();
+  });
