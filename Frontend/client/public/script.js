@@ -19,7 +19,7 @@ const state = {
 // Movie fetching and display
 async function fetchMovies() {
     try {
-        const response = await fetch('../../../Data/movieList.json');
+        const response = await fetch('/Data/movieList.json'); // Path to the static JSON served by your backend
         if (!response.ok) throw new Error('Failed to fetch movies');
         
         state.movies = await response.json();
@@ -33,7 +33,7 @@ async function fetchMovies() {
 
 async function fetchLocalMovies() {
     try {
-        const response = await fetch('../../../Data/movieList.json');
+        const response = await fetch('/Data/movieList.json'); // Same path as above
         if (!response.ok) throw new Error('Failed to fetch local movies');
         
         state.movies = await response.json();
@@ -93,7 +93,7 @@ function createMovieCard(movie) {
                         </div>
                         <button type="button" 
                             class="btn btn-sm btn-primary add-to-playlist-btn" 
-                            onclick="addToPlaylist(${movieId}, '${movieTitle}', '${moviePoster}')"
+                            onclick="addToPlaylist(${movie.id}, '${movie.title}', '${movie.imageUrl}')"
                             ${state.currentUser ? '' : 'disabled'}>
                             <i class="fas fa-plus"></i> Add to Playlist
                         </button>
@@ -276,7 +276,7 @@ function initializePlaylistUI() {
     `);
     
     // Initialize playlist modal
-    const playlistModal = new bootstrap.Modal(document.getElementById('playlistModal'));
+    const playlistModal = new window.bootstrap.Modal(document.getElementById('playlistModal'));
     
     // Add click handler for playlist button
     document.getElementById('playlistButton').addEventListener('click', () => {
@@ -651,6 +651,24 @@ async function handleAddMovie(event) {
     }
 }
 
+async function updateMovieListJson(movies) {
+    try {
+        const response = await fetch('http://localhost:3000/update-movie-list', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(movies),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update movie list');
+        }
+    } catch (error) {
+        console.error('Error updating movie list:', error);
+    }
+}
+
 // Helper function to show success/error messages (you may already have one)
 function showToast(message, type) {
     const toast = new window.bootstrap.Toast(document.getElementById('liveToast'));
@@ -662,12 +680,19 @@ function showToast(message, type) {
 
 function validateMovieData(data) {
     return (
-        data.title?.trim() &&
-        data.year > 1800 && data.year <= new Date().getFullYear() &&
-        data.requestedBy?.username?.trim() &&
-        isValidUrl(data.trailerLink) &&
-        isValidUrl(data.movieLink) &&
-        isValidUrl(data.modernTrailerLink)
+        data.title && // Title is required
+        data.year && // Year is required
+        data.category && // Category is required
+        data.requestedBy.username && // Requested By username is required
+        data.language && // Language is required
+        data.trailerLink && // Trailer Link is required
+        data.movieLink && // Movie Link is required
+        data.modernTrailerLink && // Modern Trailer Link is required
+        data.dateWatched && // Date Watched is required
+        data.imdbLink && // IMDB Link is required
+        data.tmdbLink && // TMDB Link is required
+        !isNaN(data.year) && // Year should be a number
+        (data.subtitles === 'true' || data.subtitles === 'false') // Subtitles should be boolean
     );
 }
 
