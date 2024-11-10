@@ -241,55 +241,57 @@ function initializePlaylist() {
 
 function initializePlaylistUI() {
     // Add playlist button to navbar
-    const navbarNav = document.querySelector('.navbar-nav');
-    navbarNav.insertAdjacentHTML('beforeend', `
+    const navbarContent = document.querySelector('#navbarContent .ms-auto');
+    navbarContent.insertAdjacentHTML('beforebegin', `
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item dropdown">
-            <button class="btn btn-link nav-link position-relative" id="playlistButton">
-                <i class="fas fa-list"></i> Playlist
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary playlist-count">
-                    ${playlistState.items.length}
-                </span>
-            </button>
+          <button class="btn btn-link nav-link position-relative" id="playlistButton">
+            <i class="fas fa-list"></i> Playlist
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary playlist-count">
+              ${playlistState.items.length}
+            </span>
+          </button>
         </li>
+      </ul>
     `);
-    
+  
     // Add playlist modal
     document.body.insertAdjacentHTML('beforeend', `
-        <div class="modal fade" id="playlistModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">My Playlist</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="playlistContent" class="playlist-items"></div>
-                    </div>
-                </div>
+      <div class="modal fade" id="playlistModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">My Playlist</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            <div class="modal-body">
+              <div id="playlistContent" class="playlist-items"></div>
+            </div>
+          </div>
         </div>
+      </div>
     `);
-    
+  
     // Add toast container
     document.body.insertAdjacentHTML('beforeend', `
-        <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+      <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
     `);
-    
+  
     // Initialize playlist modal
     const playlistModal = new window.bootstrap.Modal(document.getElementById('playlistModal'));
-    
+  
     // Add click handler for playlist button
     document.getElementById('playlistButton').addEventListener('click', () => {
-        playlistState.isOpen = true;
-        renderPlaylistContent();
-        playlistModal.show();
+      playlistState.isOpen = true;
+      renderPlaylistContent();
+      playlistModal.show();
     });
-    
+  
     // Handle modal close
     document.getElementById('playlistModal').addEventListener('hidden.bs.modal', () => {
-        playlistState.isOpen = false;
+      playlistState.isOpen = false;
     });
-}
+  }
 
 function renderPlaylistContent() {
     const playlistContent = document.getElementById('playlistContent');
