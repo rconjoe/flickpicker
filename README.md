@@ -1,4 +1,4 @@
-# MovieNight
+# FlickPicker
 
 This is a template for an application for Discord movie night that can be used
 for a voting system. So that users can vote on through Discord, possibly Titch,

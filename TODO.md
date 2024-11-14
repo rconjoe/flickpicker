@@ -16,8 +16,14 @@
 
 - [ ] Needs a logo
 
-- [ ] Fix the Profile so that it opens when you click on the Profile button in the user menu
+- [x] Fix the Profile so that it opens when you click on the Profile button in the user menu
 
 - [ ] Create the API and the backend; use the JSON data for when the API isn't available
 
 - [ ] Fix the footer CSS so that it is always at the bottom
+  
+- [ ] Fix the add to playlist functionality with localStorage
+
+- [ ] Add function so that when the user clicks the Details button in the movie card they can see more or brief details about the movie.
+
+- [ ] Fix the broken Add Movie modal, it does not properly add the movie to the JSON if you fill in the blanks in the modal and click Save

@@ -160,34 +160,38 @@ function logout() {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-    fetchMovies();
-    loadUserFromSession();
-    initializeEventListeners();
-    
-    // Add playlist initialization
-    initializePlaylist();
-    initializePlaylistUI();
-    
-    // Get the settings link element
-    const settingsLink = document.getElementById('settingsLink');
-    
-    if (settingsLink) {
-        settingsLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            // Get the modal through bootstrap's constructor
-            const settingsModal = new window.bootstrap.Modal(document.getElementById('settingsModal'));
-            settingsModal.show();
-        });
-    }
+    try {
+        fetchMovies();
+        loadUserFromSession();
+        initializeEventListeners();
+        
+        // Add playlist initialization
+        initializePlaylist();
+        initializePlaylistUI();
+        
+        // Get the settings link element
+        const settingsLink = document.getElementById('settingsLink');
+        
+        if (settingsLink) {
+            settingsLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Get the modal through bootstrap's constructor
+                const settingsModal = new window.bootstrap.Modal(document.getElementById('settingsModal'));
+                settingsModal.show();
+            });
+        }
 
-    const profileLink = document.getElementById('profileLink');
-    
-    if (profileLink) {
-        profileLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            const profileModal = new window.bootstrap.Modal(document.getElementById('profileModal'));
-            profileModal.show();
-        });
+        const profileLink = document.getElementById('profileLink');
+        
+        if (profileLink) {
+            profileLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                const profileModal = new window.bootstrap.Modal(document.getElementById('profileModal'));
+                profileModal.show();
+            });
+        }
+    } catch (error) {
+        console.error('Error during DOMContentLoaded event:', error);
     }
 });
 
@@ -232,12 +236,31 @@ function updatePlaylistBadge() {
 }
 
 function initializePlaylist() {
-    const savedPlaylist = localStorage.getItem('userPlaylist');
-    if (savedPlaylist) {
-        playlistState.items = JSON.parse(savedPlaylist);
-        updatePlaylistBadge();
+    try {
+        const savedPlaylist = localStorage.getItem('userPlaylist');
+        if (savedPlaylist) {
+            // Validate the data before parsing
+            if (typeof savedPlaylist === 'string' && savedPlaylist.trim() !== '') {
+                const parsedPlaylist = JSON.parse(savedPlaylist);
+                if (Array.isArray(parsedPlaylist) && parsedPlaylist.every(item => typeof item === 'object')) {
+                    playlistState.items = parsedPlaylist;
+                    updatePlaylistBadge();
+                } else {
+                    console.error('Invalid playlist data format');
+                }
+            } else {
+                console.warn('No valid playlist data found');
+            }
+        } else {
+            console.log('No saved playlist data available');
+        }
+    } catch (error) {
+        console.error('Error initializing playlist:', error);
+        // Optionally, you can reset the playlist state here
+        playlistState.items = [];
     }
 }
+
 
 function initializePlaylistUI() {
     // Add playlist button to navbar
@@ -291,7 +314,7 @@ function initializePlaylistUI() {
     document.getElementById('playlistModal').addEventListener('hidden.bs.modal', () => {
       playlistState.isOpen = false;
     });
-  }
+}
 
 function renderPlaylistContent() {
     const playlistContent = document.getElementById('playlistContent');
@@ -343,16 +366,25 @@ function addToPlaylist(movieId, movieTitle, moviePoster) {
         return;
     }
     
+    // Create a copy of the current state to avoid modifying the original object
+    const newState = { ...playlistState };
+    
     // Add movie to playlist
-    playlistState.items.push({
+    newState.items = [...newState.items, {
         id: movieId,
         title: movieTitle,
         poster: moviePoster,
         addedAt: new Date().toISOString()
-    });
+    }];
     
     // Save to localStorage
-    localStorage.setItem('userPlaylist', JSON.stringify(playlistState.items));
+    try {
+        localStorage.setItem('userPlaylist', JSON.stringify(newState.items));
+    } catch (error) {
+        console.error('Error saving to localStorage:', error);
+        showToast('Failed to save to playlist', 'error');
+        return;
+    }
     
     // Update UI
     updatePlaylistBadge();
