@@ -65,7 +65,7 @@ function createMovieCard(movie) {
         <div class="col">
             <div class="card h-100" data-movie-id="${movie.id}">
                 <img src="${movie.imageUrl}" class="card-img-top" alt="${movie.title}" 
-                     onerror="this.src='/placeholder-movie.jpg'">
+                     onerror="this.src=''">
                 <div class="card-body">
                     <h5 class="card-title">${movie.title}</h5>
                     <p class="card-text">
@@ -639,7 +639,7 @@ async function handleAddMovie(event) {
         language: document.getElementById('language').value,
         subtitles: document.getElementById('subtitles').value === 'true',
         voteCount: 0,
-        imageUrl: './img/placeholder-movie.jpg', // Default image
+        imageUrl: '', // Default image
         runtime: "", // You might want to add this to your form
         ratings: "",
         trailerPrivate: false,
@@ -698,8 +698,14 @@ async function updateMovieListJson(movies) {
         if (!response.ok) {
             throw new Error('Failed to update movie list');
         }
+
+        // Parse the response to get any returned data
+        const data = await response.json();
+        
+        console.log('Movie list updated successfully:', data.message);
     } catch (error) {
         console.error('Error updating movie list:', error);
+        throw error;
     }
 }
 
@@ -778,4 +784,4 @@ document.getElementById('saveSettingsBtn').addEventListener('click', function() 
     // Optionally close the modal after saving
     const modal = window.bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
     modal.hide();
-  });
+});

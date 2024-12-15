@@ -1,0 +1,27 @@
+{
+    "@context": "https://schema.org/",
+    "@type": "Y4:0",
+    "name": "FlickPicker - Movie Night Tracking Application",
+    "description": "A Discord bot and website for voting on movies to watch during streaming sessions.",
+    "url": "https://yourdomain.com",
+    "image": "https://yourdomain.com/path/to/icon.png",
+    "sameAs": [
+      "https://twitter.com/yourhandle",
+      "https://facebook.com/yourpage"
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "Your Name",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://yourdomain.com/path/to/logo.png"
+      }
+    },
+    "datePublished": "2024-01-15T00:00:00+08:00",
+    "dateModified": "2024-12-15T00:00:00+08:00",
+    "author": {
+      "@type": "Person",
+      "name": "Gregory Bowne"
+    }
+}
+  
