@@ -46,6 +46,79 @@ async function fetchLocalMovies() {
     }
 }
 
+function displayMovies(movies) {
+    const movieGrid = document.getElementById('movie-grid');
+    movieGrid.innerHTML = ''; // Clear existing content
+
+    // Loop through the movies and create HTML elements to display them
+    movies.forEach(movie => {
+        const movieCard = document.createElement('div');
+        movieCard.classList.add('col', 'mb-4');
+
+        movieCard.innerHTML = `
+            <div class="card">
+                <img src="${movie.imageUrl}" class="card-img-top" alt="${movie.title}">
+                <div class="card-body">
+                    <h5 class="card-title">${movie.title}</h5>
+                    <p class="card-text">Year: ${movie.year}</p>
+                    <p class="card-text">Category: ${movie.category}</p>
+                    <p class="card-text">Watched: ${movie.watched ? "Yes" : "No"}</p>
+                    <a href="${movie.trailerLink}" class="btn btn-primary" target="_blank">Watch Trailer</a>
+                </div>
+            </div>
+        `;
+
+        movieGrid.appendChild(movieCard);
+    });
+}
+
+function searchMovies() {
+    // Get the search term
+    const searchTerm = document.getElementById('movieSearch').value.toLowerCase();
+    
+    // Retrieve the list of movies from localStorage
+    const movieList = JSON.parse(localStorage.getItem('movieList')) || [];
+
+    // Filter movies based on the search term
+    const filteredMovies = movieList.filter(movie => 
+        movie.title.toLowerCase().includes(searchTerm)
+    );
+
+    // Display the filtered movies
+    displayMovies(filteredMovies);
+}
+
+// Initial display (show all movies on page load)
+displayMovies(movies);
+
+// Event listener for search input
+document.getElementById('movieSearch').addEventListener('input', searchMovies);
+
+function saveMoviesToFile() {
+    const movieList = JSON.parse(localStorage.getItem('movieList')) || [];
+
+    // Send the data to the server using fetch
+    fetch('http://localhost:3000/save-movies', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(movieList)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Movies saved successfully!');
+        } else {
+            alert('Failed to save movies.');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving movies:', error);
+        alert('Error saving movies.');
+    });
+}
+
 function updateMovieDisplay() {
     const movieGrid = document.getElementById('movie-grid');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
@@ -784,4 +857,76 @@ document.getElementById('saveSettingsBtn').addEventListener('click', function() 
     // Optionally close the modal after saving
     const modal = window.bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
     modal.hide();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField = document.getElementById('password');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    togglePassword.addEventListener('click', function() {
+        // Toggle the password field type
+        const type = passwordField.type === 'password' ? 'text' : 'password';
+        passwordField.type = type;
+
+        // Toggle the eye icon
+        if (type === 'password') {
+            eyeIcon.classList.remove('fa-solid fa-eye-slash');
+            eyeIcon.classList.add('fa-solid fa-eye');
+        } else {
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-solid fa-eye-slash');
+        }
+    });
+});
+
+document.getElementById('submitMovieBtn').addEventListener('click', function() {
+    const title = document.getElementById('title').value;
+    const dateWatched = document.getElementById('dateWatched').value;
+    const year = document.getElementById('year').value;
+    const category = document.getElementById('category').value;
+    const trailerLink = document.getElementById('trailerLink').value;
+    const movieLink = document.getElementById('movieLink').value;
+    const modernTrailerLink = document.getElementById('modernTrailerLink').value;
+    const requestedBy = document.getElementById('requestedBy').value;
+    const language = document.getElementById('language').value;
+    const subtitles = document.getElementById('subtitles').value === "true"; // Convert to boolean
+    const imdbLink = document.getElementById('imdbLink').value;
+    const tmdbLink = document.getElementById('tmdbLink').value;
+
+    const newMovie = {
+        id: Date.now(),
+        title: title,
+        dateWatched: dateWatched,
+        watched: false,
+        trailerLink: trailerLink,
+        movieLink: movieLink,
+        modernTrailerLink: modernTrailerLink,
+        requestedBy: {
+            userId: "987654320",
+            username: requestedBy,
+            platform: "Discord"
+        },
+        category: category,
+        trailerPrivate: false,
+        moviePrivate: false,
+        year: year,
+        subtitles: subtitles,
+        language: language,
+        voteCount: 0,
+        imageUrl: "./img/movie1.jpg",
+        runtime: "1h30m",
+        ratings: ""
+    };
+
+    // Save the movie to localStorage (in the browser)
+    let movieList = JSON.parse(localStorage.getItem('movieList')) || [];
+    movieList.push(newMovie);
+    localStorage.setItem('movieList', JSON.stringify(movieList));
+
+    alert('Movie added successfully!');
+    // Close the modal
+    const myModal = new window.bootstrap.Modal(document.getElementById('addMovieModal'));
+    myModal.hide();
+    searchMovies();
 });

@@ -60,6 +60,24 @@ app.post('/update-movie-list', async (req, res) => {
     }
 });
 
+app.post('/save-movies', (req, res) => {
+    const movieList = req.body;
+
+    // Define the path to the JSON file
+    const filePath = path.join(__dirname, 'Data', 'movieList.json');
+
+    // Write the movie list to the JSON file
+    fs.writeFile(filePath, JSON.stringify(movieList, null, 2), (err) => {
+        if (err) {
+            console.error('Error saving movies:', err);
+            return res.status(500).json({ success: false, message: 'Failed to save movies' });
+        }
+
+        console.log('Movies saved successfully!');
+        return res.json({ success: true, message: 'Movies saved successfully' });
+    });
+});
+
 const DEFAULT_PORT = 3000;
 const MAX_PORT = 4000; // Set an upper limit for port scanning
 
