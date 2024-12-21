@@ -1,92 +1,9 @@
-// State management
-const playlistState = {
-    items: [],
-    isOpen: false
-};
-
-const state = {
-    movies: [],
-    filteredMovies: [],
-    currentUser: null,
-    settings: {
-        theme: 'dark',
-        emailNotifications: true,
-        discordNotifications: false,
-        voteLimit: 3
-    }
-};
-
-// Movie fetching and display
-async function fetchMovies() {
-    try {
-        const response = await fetch('/Data/movieList.json'); // Path to the static JSON served by your backend
-        if (!response.ok) throw new Error('Failed to fetch movies');
-        
-        state.movies = await response.json();
-        state.filteredMovies = [...state.movies];
-        updateMovieDisplay();
-    } catch (error) {
-        console.error('Error fetching movies:', error);
-        fetchLocalMovies();
-    }
-}
-
-async function fetchLocalMovies() {
-    try {
-        const response = await fetch('/Data/movieList.json'); // Same path as above
-        if (!response.ok) throw new Error('Failed to fetch local movies');
-        
-        state.movies = await response.json();
-        state.filteredMovies = [...state.movies];
-        updateMovieDisplay();
-        showError('API is down, using local data.');
-    } catch (error) {
-        console.error('Error fetching local movies:', error);
-        showError('Failed to load movies. Please try again later.');
-    }
-}
-
-function displayMovies(movies) {
-    const movieGrid = document.getElementById('movie-grid');
-    movieGrid.innerHTML = ''; // Clear existing content
-
-    // Loop through the movies and create HTML elements to display them
-    movies.forEach(movie => {
-        const movieCard = document.createElement('div');
-        movieCard.classList.add('col', 'mb-4');
-
-        movieCard.innerHTML = `
-            <div class="card">
-                <img src="${movie.imageUrl}" class="card-img-top" alt="${movie.title}">
-                <div class="card-body">
-                    <h5 class="card-title">${movie.title}</h5>
-                    <p class="card-text">Year: ${movie.year}</p>
-                    <p class="card-text">Category: ${movie.category}</p>
-                    <p class="card-text">Watched: ${movie.watched ? "Yes" : "No"}</p>
-                    <a href="${movie.trailerLink}" class="btn btn-primary" target="_blank">Watch Trailer</a>
-                </div>
-            </div>
-        `;
-
-        movieGrid.appendChild(movieCard);
-    });
-}
-
-function searchMovies() {
-    // Get the search term
-    const searchTerm = document.getElementById('movieSearch').value.toLowerCase();
-    
-    // Retrieve the list of movies from localStorage
-    const movieList = JSON.parse(localStorage.getItem('movieList')) || [];
-
-    // Filter movies based on the search term
-    const filteredMovies = movieList.filter(movie => 
-        movie.title.toLowerCase().includes(searchTerm)
-    );
-
-    // Display the filtered movies
-    displayMovies(filteredMovies);
-}
+import { playlistState, state } from './state';
+import { showError, showToast } from '../public/utils';
+import { login, logout, isAuthenticated, loadUserFromSession } from '../public/auth';
+import { initializePlaylist, initializePlaylistUI } from './public/playlist';
+import { searchMovies } from './public/search';
+import { fetchMovies, displayMovies } from './public/movies';
 
 // Initial display (show all movies on page load)
 displayMovies(movies);
@@ -210,27 +127,6 @@ function sortMovies(criteria) {
     });
 }
 
-// User Authentication
-function login(username, password) {
-    // In production, this should be an API call
-    if (validateCredentials(username, password)) {
-        state.currentUser = { username, id: Date.now() };
-        sessionStorage.setItem('user', JSON.stringify(state.currentUser));
-        updateAuthUI();
-        $('#loginModal').modal('hide');
-        showToast('Successfully logged in!');
-    } else {
-        showError('Invalid credentials');
-    }
-}
-
-function logout() {
-    state.currentUser = null;
-    sessionStorage.removeItem('user');
-    updateAuthUI();
-    showToast('Successfully logged out');
-}
-
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     try {
@@ -293,101 +189,6 @@ function handleVote(movieId, voteType) {
     console.log(`Vote ${voteType} for movie ${movieId}`);
     // Update UI or make API call to record vote
 }
-function removeFromPlaylist(movieId) {
-    playlistState.items = playlistState.items.filter(item => item.id !== movieId);
-    localStorage.setItem('userPlaylist', JSON.stringify(playlistState.items));
-    updatePlaylistBadge();
-    renderPlaylistContent();
-    showToast('Removed from playlist', 'success');
-}
-
-function updatePlaylistBadge() {
-    const badge = document.querySelector('.playlist-count');
-    if (badge) {
-        badge.textContent = playlistState.items.length;
-    }
-}
-
-function initializePlaylist() {
-    try {
-        const savedPlaylist = localStorage.getItem('userPlaylist');
-        if (savedPlaylist) {
-            // Validate the data before parsing
-            if (typeof savedPlaylist === 'string' && savedPlaylist.trim() !== '') {
-                const parsedPlaylist = JSON.parse(savedPlaylist);
-                if (Array.isArray(parsedPlaylist) && parsedPlaylist.every(item => typeof item === 'object')) {
-                    playlistState.items = parsedPlaylist;
-                    updatePlaylistBadge();
-                } else {
-                    console.error('Invalid playlist data format');
-                }
-            } else {
-                console.warn('No valid playlist data found');
-            }
-        } else {
-            console.log('No saved playlist data available');
-        }
-    } catch (error) {
-        console.error('Error initializing playlist:', error);
-        // Optionally, you can reset the playlist state here
-        playlistState.items = [];
-    }
-}
-
-
-function initializePlaylistUI() {
-    // Add playlist button to navbar
-    const navbarContent = document.querySelector('#navbarContent .ms-auto');
-    navbarContent.insertAdjacentHTML('beforebegin', `
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item dropdown">
-          <button class="btn btn-link nav-link position-relative" id="playlistButton">
-            <i class="fas fa-list"></i> Playlist
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary playlist-count">
-              ${playlistState.items.length}
-            </span>
-          </button>
-        </li>
-      </ul>
-    `);
-  
-    // Add playlist modal
-    document.body.insertAdjacentHTML('beforeend', `
-      <div class="modal fade" id="playlistModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">My Playlist</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <div id="playlistContent" class="playlist-items"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `);
-  
-    // Add toast container
-    document.body.insertAdjacentHTML('beforeend', `
-      <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
-    `);
-  
-    // Initialize playlist modal
-    const playlistModal = new window.bootstrap.Modal(document.getElementById('playlistModal'));
-  
-    // Add click handler for playlist button
-    document.getElementById('playlistButton').addEventListener('click', () => {
-      playlistState.isOpen = true;
-      renderPlaylistContent();
-      playlistModal.show();
-    });
-  
-    // Handle modal close
-    document.getElementById('playlistModal').addEventListener('hidden.bs.modal', () => {
-      playlistState.isOpen = false;
-    });
-}
 
 function renderPlaylistContent() {
     const playlistContent = document.getElementById('playlistContent');
@@ -427,48 +228,6 @@ function renderPlaylistContent() {
     `;
 }
 
-function addToPlaylist(movieId, movieTitle, moviePoster) {
-    if (!state.currentUser) {
-        showToast('Please log in to add to playlist', 'warning');
-        return;
-    }
-    
-    // Check if movie already exists in playlist
-    if (playlistState.items.some(item => item.id === movieId)) {
-        showToast('Movie already in playlist', 'info');
-        return;
-    }
-    
-    // Create a copy of the current state to avoid modifying the original object
-    const newState = { ...playlistState };
-    
-    // Add movie to playlist
-    newState.items = [...newState.items, {
-        id: movieId,
-        title: movieTitle,
-        poster: moviePoster,
-        addedAt: new Date().toISOString()
-    }];
-    
-    // Save to localStorage
-    try {
-        localStorage.setItem('userPlaylist', JSON.stringify(newState.items));
-    } catch (error) {
-        console.error('Error saving to localStorage:', error);
-        showToast('Failed to save to playlist', 'error');
-        return;
-    }
-    
-    // Update UI
-    updatePlaylistBadge();
-    showToast('Added to playlist successfully', 'success');
-    
-    // If playlist is open, refresh its content
-    if (playlistState.isOpen) {
-        renderPlaylistContent();
-    }
-}
-
 function initializeEventListeners() {
     // Filter listeners
     document.querySelectorAll('#filter-section select').forEach(select => {
@@ -486,44 +245,6 @@ function initializeEventListeners() {
     
     // Movie interaction listeners
     document.getElementById('movie-grid').addEventListener('click', handleMovieInteraction);
-}
-
-// Utility Functions
-function showToast(message, type = 'success') {
-    // Implementation depends on your toast library
-    console.log(`Toast: ${message} (${type})`);
-}
-
-function showError(message) {
-    showToast(message, 'error');
-}
-
-function validateCredentials(username, password) {
-    // Implement proper validation
-    return username.length > 0 && password.length > 0;
-}
-
-function loadUserFromSession() {
-    const savedUser = sessionStorage.getItem('user');
-    if (savedUser) {
-        state.currentUser = JSON.parse(savedUser);
-        updateAuthUI();
-    }
-}
-
-function updateAuthUI() {
-    const authButtons = document.getElementById('auth-buttons');
-    const userMenu = document.getElementById('userMenu');
-    const loginButton = document.getElementById('loginButton');
-    
-    if (state.currentUser) {
-        loginButton.classList.add('d-none');
-        userMenu.classList.remove('d-none');
-        document.querySelector('.username').textContent = state.currentUser.username;
-    } else {
-        loginButton.classList.remove('d-none');
-        userMenu.classList.add('d-none');
-    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -782,15 +503,6 @@ async function updateMovieListJson(movies) {
     }
 }
 
-// Helper function to show success/error messages (you may already have one)
-function showToast(message, type) {
-    const toast = new window.bootstrap.Toast(document.getElementById('liveToast'));
-    const toastBody = document.querySelector('.toast-body');
-    toastBody.textContent = message;
-    toast.show();
-}
-
-
 function validateMovieData(data) {
     return (
         data.title && // Title is required
@@ -834,6 +546,16 @@ if ('serviceWorker' in navigator) {
       }
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const addMovieButton = document.getElementById('addMovieButton');
+
+    if (!isAuthenticated()) {
+        addMovieButton.style.display = 'none';  // Hide "Add Movie" button
+    } else {
+        addMovieButton.style.display = 'block';  // Show "Add Movie" button
+    }
+});
 
 document.getElementById('saveSettingsBtn').addEventListener('click', function() {
     // Capture the values from the modal

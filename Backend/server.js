@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const app = express();
 const { updateMovieListJson } = require('../Frontend/client/public/script');
 
+const filePath = path.join(__dirname, '..', 'Data', 'movieList.json');
+
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
