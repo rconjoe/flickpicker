@@ -1,3 +1,4 @@
+import { displayMovies } from '../public/movies'
 
 function searchMovies() {
     // Get the search term

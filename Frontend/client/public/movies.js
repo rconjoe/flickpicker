@@ -1,3 +1,64 @@
+import { state } from '../public/state';
+import { showError } from '../public/utils';
+
+function createMovieCard(movie) {
+    return `
+        <div class="col">
+            <div class="card h-100" data-movie-id="${movie.id}">
+                <img src="${movie.imageUrl}" class="card-img-top" alt="${movie.title}" 
+                     onerror="this.src=''">
+                <div class="card-body">
+                    <h5 class="card-title">${movie.title}</h5>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            ${movie.year} • ${movie.runtime} • ${movie.rating}
+                        </small>
+                    </p>
+                    <p class="card-text">${movie.category}</p>
+                    <p class="card-text">
+                        <small class="text-muted">Requested by ${movie.requestedBy.username}</small>
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-primary vote-btn" 
+                                    data-vote="up" ${state.currentUser ? '' : 'disabled'}>
+                                <i class="fas fa-thumbs-up"></i> 
+                                <span class="vote-count">${movie.voteCount}</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                    onclick="showMovieDetails('${movie.id}')">
+                                <i class="fas fa-info-circle"></i> Details
+                            </button>
+                        </div>
+                        <button type="button" 
+                            class="btn btn-sm btn-primary add-to-playlist-btn" 
+                            onclick="addToPlaylist(${movie.id}, '${movie.title}', '${movie.imageUrl}')"
+                            ${state.currentUser ? '' : 'disabled'}>
+                            <i class="fas fa-plus"></i> Add to Playlist
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function updateMovieDisplay() {
+    const movieGrid = document.getElementById('movie-grid');
+    const loadingPlaceholder = document.getElementById('loading-placeholder');
+    
+    if (loadingPlaceholder) loadingPlaceholder.style.display = 'none';
+    
+    if (state.filteredMovies.length === 0) {
+        movieGrid.innerHTML = '<div class="col-12 text-center"><p>No movies found matching your criteria.</p></div>';
+        return;
+    }
+    
+    movieGrid.innerHTML = state.filteredMovies.map(movie => createMovieCard(movie)).join('');
+}
+
 // Movie fetching and display
 async function fetchMovies() {
     try {

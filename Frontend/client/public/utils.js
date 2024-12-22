@@ -4,3 +4,15 @@ function showToast(message, type) {
     toastBody.textContent = message;
     toast.show();
 }
+
+function showError(message, duration = 3000) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    
+    document.body.appendChild(errorDiv);
+  
+    setTimeout(() => {
+      errorDiv.remove();
+    }, duration);
+  }

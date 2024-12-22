@@ -1,9 +1,9 @@
-import { playlistState, state } from './state';
+import { playlistState, state } from '../public/state';
 import { showError, showToast } from '../public/utils';
 import { login, logout, isAuthenticated, loadUserFromSession } from '../public/auth';
-import { initializePlaylist, initializePlaylistUI } from './public/playlist';
-import { searchMovies } from './public/search';
-import { fetchMovies, displayMovies } from './public/movies';
+import { initializePlaylist, initializePlaylistUI, addToPlaylist } from '../public/playlist';
+import { searchMovies } from '../public/search';
+import { fetchMovies, displayMovies, updateMovieDisplay } from '../public/movies';
 
 // Initial display (show all movies on page load)
 displayMovies(movies);
@@ -34,64 +34,6 @@ function saveMoviesToFile() {
         console.error('Error saving movies:', error);
         alert('Error saving movies.');
     });
-}
-
-function updateMovieDisplay() {
-    const movieGrid = document.getElementById('movie-grid');
-    const loadingPlaceholder = document.getElementById('loading-placeholder');
-    
-    if (loadingPlaceholder) loadingPlaceholder.style.display = 'none';
-    
-    if (state.filteredMovies.length === 0) {
-        movieGrid.innerHTML = '<div class="col-12 text-center"><p>No movies found matching your criteria.</p></div>';
-        return;
-    }
-    
-    movieGrid.innerHTML = state.filteredMovies.map(movie => createMovieCard(movie)).join('');
-}
-
-function createMovieCard(movie) {
-    return `
-        <div class="col">
-            <div class="card h-100" data-movie-id="${movie.id}">
-                <img src="${movie.imageUrl}" class="card-img-top" alt="${movie.title}" 
-                     onerror="this.src=''">
-                <div class="card-body">
-                    <h5 class="card-title">${movie.title}</h5>
-                    <p class="card-text">
-                        <small class="text-muted">
-                            ${movie.year} • ${movie.runtime} • ${movie.rating}
-                        </small>
-                    </p>
-                    <p class="card-text">${movie.category}</p>
-                    <p class="card-text">
-                        <small class="text-muted">Requested by ${movie.requestedBy.username}</small>
-                    </p>
-                </div>
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-outline-primary vote-btn" 
-                                    data-vote="up" ${state.currentUser ? '' : 'disabled'}>
-                                <i class="fas fa-thumbs-up"></i> 
-                                <span class="vote-count">${movie.voteCount}</span>
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-primary" 
-                                    onclick="showMovieDetails('${movie.id}')">
-                                <i class="fas fa-info-circle"></i> Details
-                            </button>
-                        </div>
-                        <button type="button" 
-                            class="btn btn-sm btn-primary add-to-playlist-btn" 
-                            onclick="addToPlaylist(${movie.id}, '${movie.title}', '${movie.imageUrl}')"
-                            ${state.currentUser ? '' : 'disabled'}>
-                            <i class="fas fa-plus"></i> Add to Playlist
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
 }
 
 // Filtering and Sorting
@@ -188,44 +130,6 @@ function handleVote(movieId, voteType) {
     // Implement voting logic here
     console.log(`Vote ${voteType} for movie ${movieId}`);
     // Update UI or make API call to record vote
-}
-
-function renderPlaylistContent() {
-    const playlistContent = document.getElementById('playlistContent');
-    
-    if (playlistState.items.length === 0) {
-        playlistContent.innerHTML = `
-            <div class="text-center py-5">
-                <i class="fas fa-film fa-3x mb-3 text-muted"></i>
-                <p class="text-muted">Your playlist is empty</p>
-            </div>
-        `;
-        return;
-    }
-    
-    playlistContent.innerHTML = `
-        <div class="row g-3">
-            ${playlistState.items.map(movie => `
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100">
-                        <img src="${movie.poster}" class="card-img-top" alt="${movie.title}">
-                        <div class="card-body">
-                            <h6 class="card-title">${movie.title}</h6>
-                            <p class="card-text small text-muted">
-                                Added ${new Date(movie.addedAt).toLocaleDateString()}
-                            </p>
-                        </div>
-                        <div class="card-footer bg-transparent border-top-0">
-                            <button type="button" class="btn btn-sm btn-outline-danger" 
-                                    onclick="removeFromPlaylist(${movie.id})">
-                                <i class="fas fa-trash-alt"></i> Remove
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-    `;
 }
 
 function initializeEventListeners() {

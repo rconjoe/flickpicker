@@ -3,7 +3,15 @@ const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/styles.css',
+  '/auth.js',
+  '/app.js',
+  '/index.js',
+  '/profile.js',
+  '/playlist.js',
   '/script.js',
+  '/search.js',
+  '/utils.js',
+  '/state.js',
   '/manifest.json',
   '/favicon.ico',
   '/logo.svg',
@@ -38,6 +46,10 @@ self.addEventListener('install', (event) => {
 
 // Fetch event handler
 self.addEventListener('fetch', (event) => {
+  if (!event.request.url.startsWith('/api/') && !event.request.url.endsWith('.js')) {
+    return;
+  }
+
   event.respondWith(
     (async () => {
       try {

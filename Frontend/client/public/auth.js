@@ -68,11 +68,3 @@ function logout() {
     updateAuthUI();
     showToast('Successfully logged out');
 }
-
-function loadUserFromSession() {
-    const savedUser = sessionStorage.getItem('user');
-    if (savedUser) {
-        state.currentUser = JSON.parse(savedUser);
-        updateAuthUI();
-    }
-}
