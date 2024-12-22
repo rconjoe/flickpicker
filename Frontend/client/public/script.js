@@ -36,6 +36,9 @@ function saveMoviesToFile() {
     });
 }
 
+// Attach the function to the global scope
+window.saveMoviesToFile = saveMoviesToFile;
+
 // Filtering and Sorting
 function applyFilters() {
     const genre = document.getElementById('genre-filter').value.toLowerCase();
