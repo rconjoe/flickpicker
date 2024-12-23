@@ -1,4 +1,4 @@
-import { displayMovies } from '../public/movies'
+import { displayMovies } from '../public/movies.mjs'
 
 export function searchMovies() {
     // Get the search term

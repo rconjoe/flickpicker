@@ -1,9 +1,9 @@
-import { playlistState, state } from '../public/state';
-import { showError, showToast } from '../public/utils';
-import { login, logout, isAuthenticated, loadUserFromSession } from '../public/auth';
-import { initializePlaylist, initializePlaylistUI, addToPlaylist } from '../public/playlist';
-import { searchMovies } from '../public/search';
-import { fetchMovies, displayMovies, updateMovieDisplay } from '../public/movies';
+import { playlistState, state } from '../public/state.mjs';
+import { showError, showToast } from '../public/utils.mjs';
+import { login, logout, isAuthenticated, loadUserFromSession } from '../public/auth.mjs';
+import { initializePlaylist, initializePlaylistUI, addToPlaylist } from '../public/playlist.mjs';
+import { searchMovies } from '../public/search.mjs';
+import { fetchMovies, displayMovies, updateMovieDisplay } from '../public/movies.mjs';
 
 // Initial display (show all movies on page load)
 displayMovies(movies);

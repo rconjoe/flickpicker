@@ -1,5 +1,5 @@
-import { state } from '../public/state';
-import { showError } from '../public/utils';
+import { state } from '../public/state.mjs';
+import { showError } from '../public/utils.mjs';
 
 export function createMovieCard(movie) {
     return `
