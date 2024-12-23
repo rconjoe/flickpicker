@@ -1,7 +1,7 @@
 import { state } from '../public/state';
 import { showError } from '../public/utils';
 
-function createMovieCard(movie) {
+export function createMovieCard(movie) {
     return `
         <div class="col">
             <div class="card h-100" data-movie-id="${movie.id}">
@@ -45,7 +45,7 @@ function createMovieCard(movie) {
     `;
 }
 
-function updateMovieDisplay() {
+export function updateMovieDisplay() {
     const movieGrid = document.getElementById('movie-grid');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
     
@@ -60,7 +60,7 @@ function updateMovieDisplay() {
 }
 
 // Movie fetching and display
-async function fetchMovies() {
+export async function fetchMovies() {
     try {
         const response = await fetch('/Data/movieList.json'); // Path to the static JSON served by your backend
         if (!response.ok) throw new Error('Failed to fetch movies');
@@ -74,7 +74,7 @@ async function fetchMovies() {
     }
 }
 
-async function fetchLocalMovies() {
+export async function fetchLocalMovies() {
     try {
         const response = await fetch('/Data/movieList.json'); // Same path as above
         if (!response.ok) throw new Error('Failed to fetch local movies');
@@ -89,7 +89,7 @@ async function fetchLocalMovies() {
     }
 }
 
-function displayMovies(movies) {
+export function displayMovies(movies) {
     const movieGrid = document.getElementById('movie-grid');
     movieGrid.innerHTML = ''; // Clear existing content
 

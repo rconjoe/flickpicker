@@ -11,7 +11,7 @@ displayMovies(movies);
 // Event listener for search input
 document.getElementById('movieSearch').addEventListener('input', searchMovies);
 
-function saveMoviesToFile() {
+export function saveMoviesToFile() {
     const movieList = JSON.parse(localStorage.getItem('movieList')) || [];
 
     // Send the data to the server using fetch
@@ -40,7 +40,7 @@ function saveMoviesToFile() {
 window.saveMoviesToFile = saveMoviesToFile;
 
 // Filtering and Sorting
-function applyFilters() {
+export function applyFilters() {
     const genre = document.getElementById('genre-filter').value.toLowerCase();
     const year = document.getElementById('year-filter').value;
     const rating = document.getElementById('rating-filter').value;
@@ -57,7 +57,7 @@ function applyFilters() {
     updateMovieDisplay();
 }
 
-function sortMovies(criteria) {
+export function sortMovies(criteria) {
     state.filteredMovies.sort((a, b) => {
         switch(criteria) {
             case 'title':
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function handleMovieInteraction(event) {
+export function handleMovieInteraction(event) {
     const target = event.target;
     const movieCard = target.closest('.card');
     
@@ -124,7 +124,7 @@ function handleMovieInteraction(event) {
     }
 }
 
-function handleVote(movieId, voteType) {
+export function handleVote(movieId, voteType) {
     if (!state.currentUser) {
         showToast('Please log in to vote', 'warning');
         return;
@@ -135,7 +135,7 @@ function handleVote(movieId, voteType) {
     // Update UI or make API call to record vote
 }
 
-function initializeEventListeners() {
+export function initializeEventListeners() {
     // Filter listeners
     document.querySelectorAll('#filter-section select').forEach(select => {
         select.addEventListener('change', applyFilters);
@@ -318,7 +318,7 @@ const userProfile = new UserProfile();
 
 document.getElementById('submitMovieBtn').addEventListener('click', handleAddMovie);
 
-async function handleAddMovie(event) {
+export async function handleAddMovie(event) {
     event.preventDefault();
 
     // Gather data from the modal form
@@ -386,7 +386,7 @@ async function handleAddMovie(event) {
     }
 }
 
-async function updateMovieListJson(movies) {
+export async function updateMovieListJson(movies) {
     try {
         const response = await fetch('http://localhost:3000/update-movie-list', {
             method: 'POST',
@@ -410,7 +410,7 @@ async function updateMovieListJson(movies) {
     }
 }
 
-function validateMovieData(data) {
+export function validateMovieData(data) {
     return (
         data.title && // Title is required
         data.year && // Year is required
@@ -428,7 +428,7 @@ function validateMovieData(data) {
     );
 }
 
-function isValidUrl(string) {
+export function isValidUrl(string) {
     if (!string) return true; // Allow empty strings
     try {
         new URL(string);

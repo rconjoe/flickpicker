@@ -1,8 +1,8 @@
 import { state } from './state';
-import { showToast } from '../public/utils';
+import { showToast, showError } from '../public/utils';
 
 // User Authentication
-function updateAuthUI() {
+export function updateAuthUI() {
     const authButtons = document.getElementById('auth-buttons');
     const userMenu = document.getElementById('userMenu');
     const loginButton = document.getElementById('loginButton');
@@ -17,7 +17,7 @@ function updateAuthUI() {
     }
 }
 
-function registerUser(username, password) {
+export function registerUser(username, password) {
     const users = JSON.parse(localStorage.getItem('users')) || [];
     
     // Simple check to avoid duplicates (make sure username is unique)
@@ -33,23 +33,23 @@ function registerUser(username, password) {
     alert('Registration successful!');
 }
 
-function isAuthenticated() {
+export function isAuthenticated() {
     return localStorage.getItem('authUser') !== null;
 }
 
-function validateCredentials(username, password) {
+export function validateCredentials(username, password) {
     // Implement proper validation
     return username.length > 0 && password.length > 0;
 }
 
-function loadUserFromSession() {
+export function loadUserFromSession() {
     const savedUser = sessionStorage.getItem('user');
     if (savedUser) {
         state.currentUser = JSON.parse(savedUser);
         updateAuthUI();
     }
 }
-function login(username, password) {
+export function login(username, password) {
     // In production, this should be an API call
     if (validateCredentials(username, password)) {
         state.currentUser = { username, id: Date.now() };
@@ -62,7 +62,7 @@ function login(username, password) {
     }
 }
 
-function logout() {
+export function logout() {
     state.currentUser = null;
     sessionStorage.removeItem('user');
     updateAuthUI();

@@ -1,14 +1,14 @@
 import { playlistState, state } from '../public/state';
 import { showToast } from '../public/utils';
 
-function updatePlaylistBadge() {
+export function updatePlaylistBadge() {
     const badge = document.querySelector('.playlist-count');
     if (badge) {
         badge.textContent = playlistState.items.length;
     }
 }
 
-function initializePlaylist() {
+export function initializePlaylist() {
     try {
         const savedPlaylist = localStorage.getItem('userPlaylist');
         if (savedPlaylist) {
@@ -34,7 +34,7 @@ function initializePlaylist() {
     }
 }
 
-function renderPlaylistContent() {
+export function renderPlaylistContent() {
     const playlistContent = document.getElementById('playlistContent');
     
     if (playlistState.items.length === 0) {
@@ -72,7 +72,7 @@ function renderPlaylistContent() {
     `;
 }
 
-function initializePlaylistUI() {
+export function initializePlaylistUI() {
     // Add playlist button to navbar
     const navbarContent = document.querySelector('#navbarContent .ms-auto');
     navbarContent.insertAdjacentHTML('beforebegin', `
@@ -126,7 +126,7 @@ function initializePlaylistUI() {
     });
 }
 
-function addToPlaylist(movieId, movieTitle, moviePoster) {
+export function addToPlaylist(movieId, movieTitle, moviePoster) {
     if (!state.currentUser) {
         showToast('Please log in to add to playlist', 'warning');
         return;
@@ -168,7 +168,7 @@ function addToPlaylist(movieId, movieTitle, moviePoster) {
     }
 }
 
-function removeFromPlaylist(movieId) {
+export function removeFromPlaylist(movieId) {
     playlistState.items = playlistState.items.filter(item => item.id !== movieId);
     localStorage.setItem('userPlaylist', JSON.stringify(playlistState.items));
     updatePlaylistBadge();

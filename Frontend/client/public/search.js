@@ -1,6 +1,6 @@
 import { displayMovies } from '../public/movies'
 
-function searchMovies() {
+export function searchMovies() {
     // Get the search term
     const searchTerm = document.getElementById('movieSearch').value.toLowerCase();
     
