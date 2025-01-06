@@ -5,6 +5,8 @@ import { initializePlaylist, initializePlaylistUI, addToPlaylist } from '../publ
 import { searchMovies } from '../public/search.mjs';
 import { fetchMovies, displayMovies, updateMovieDisplay } from '../public/movies.mjs';
 
+const movies = JSON.parse(localStorage.getItem('movieList')) || [];
+
 // Initial display (show all movies on page load)
 displayMovies(movies);
 
@@ -36,9 +38,9 @@ export function saveMoviesToFile() {
     });
 }
 
-// Attach the function to the global scope
-window.saveMoviesToFile = saveMoviesToFile;
-
+if (typeof window !== 'undefined') {
+    window.saveMoviesToFile = saveMoviesToFile; // This exposes it to the global scope
+}
 // Filtering and Sorting
 export function applyFilters() {
     const genre = document.getElementById('genre-filter').value.toLowerCase();

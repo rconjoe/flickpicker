@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const bodyParser = require('body-parser');
 const app = express();
-const { updateMovieListJson } = require('../Frontend/client/public/script');
+const { updateMovieListJson } = require('../Frontend/client/public/script.mjs');
 
 const filePath = path.join(__dirname, '..', 'Data', 'movieList.json');
 

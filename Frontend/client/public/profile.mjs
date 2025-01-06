@@ -1,7 +1,6 @@
-import { Modal } from 'bootstrap';
-
 class ProfileManager {
     constructor() {
+        // Initialize modals and mock data
         this.profileModal = null;
         this.searchModal = null;
         this.mockProfileData = {
@@ -20,22 +19,24 @@ class ProfileManager {
             lastAttended: 'Yesterday',
             nextHosting: 'Friday 8 PM'
         };
-        
+
+        // Initialize modals and event listeners
         this.initializeModals();
         this.attachEventListeners();
         this.loadMockData();
     }
 
     initializeModals() {
+        // Use Bootstrap 5 modal API to initialize modals
         const profileModalEl = document.getElementById('profileModal');
         const searchModalEl = document.getElementById('searchProfilesModal');
-        
+
         if (profileModalEl) {
-            this.profileModal = new Modal(profileModalEl);
+            this.profileModal = new window.bootstrap.Modal(profileModalEl);
         }
-        
+
         if (searchModalEl) {
-            this.searchModal = new Modal(searchModalEl);
+            this.searchModal = new window.bootstrap.Modal(searchModalEl);
         }
     }
 
@@ -63,12 +64,14 @@ class ProfileManager {
     }
 
     showProfile() {
+        // Show profile modal
         if (this.profileModal) {
             this.profileModal.show();
         }
     }
 
     loadMockData() {
+        // Load the mock data into the UI
         this.updateProfileUI(this.mockProfileData);
     }
 
@@ -123,19 +126,21 @@ class ProfileManager {
 
         // Log the changes (since we don't have a backend)
         console.log('Profile changes saved:', formData);
-        
+
         // Hide the modal
-        this.profileModal.hide();
-        
-        // You could show a success message here
+        if (this.profileModal) {
+            this.profileModal.hide();
+        }
+
+        // Show success message (this can be replaced with a toast or a more sophisticated method)
         alert('Profile changes saved successfully!');
     }
 
     searchProfiles() {
         const searchQuery = document.getElementById('searchQuery').value.toLowerCase();
         const searchResults = document.getElementById('searchResults');
-        
-        // Mock search results
+
+        // Mock search results (for demonstration purposes)
         const mockUsers = [
             { username: 'FilmFanatic', moviesWatched: 156 },
             { username: 'CinemaLover', moviesWatched: 203 },
@@ -147,7 +152,7 @@ class ProfileManager {
             user.username.toLowerCase().includes(searchQuery)
         );
 
-        // Display results
+        // Display search results
         searchResults.innerHTML = filteredResults.length ? 
             filteredResults.map(user => `
                 <div class="d-flex align-items-center p-2 border-bottom">

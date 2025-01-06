@@ -1,5 +1,6 @@
 import { state } from './state.mjs';
 import { showToast, showError } from './utils.mjs';
+import { updateAuthUI, closeModal } from './ui.mjs';
 
 // Default test user
 const defaultUsers = [
@@ -8,27 +9,6 @@ const defaultUsers = [
 
 // Initialize authentication functionality
 document.addEventListener('DOMContentLoaded', () => {
-    // Setup password visibility toggle
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
-    const eyeIcon = document.getElementById('eyeIcon');
-
-    if (togglePassword && passwordInput && eyeIcon) {
-        togglePassword.addEventListener('click', () => {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            
-            if (type === 'password') {
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-            } else {
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-            }
-        });
-    }
-
-    // Setup login button handler
     const loginBtn = document.getElementById('loginBtn');
     if (loginBtn) {
         loginBtn.addEventListener('click', async (e) => {
@@ -44,18 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 await login(username, password);
-                const loginModal = document.getElementById('loginModal');
-                const bsModal = window.bootstrap.Modal.getInstance(loginModal);
-                if (bsModal) {
-                    bsModal.hide();
-                }
+                closeModal('loginModal');  // Close modal after successful login
             } catch (error) {
                 showError(error.message);
             }
         });
     }
 
-    // Setup logout handler
     const logoutLink = document.getElementById('logoutLink');
     if (logoutLink) {
         logoutLink.addEventListener('click', (e) => {
@@ -68,28 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
     loadUserFromSession();
 });
 
+
+// Validate credentials
 function validateCredentials(username, password) {
     return !!username?.trim() && !!password?.trim();
 }
 
-function updateAuthUI() {
-    const loginButton = document.getElementById('loginButton');
-    const userMenu = document.getElementById('userMenu');
-    
-    if (state.currentUser) {
-        loginButton?.classList.add('d-none');
-        userMenu?.classList.remove('d-none');
-        const usernameElement = document.querySelector('#userMenu .username');
-        if (usernameElement) {
-            usernameElement.textContent = state.currentUser.username;
-        }
-    } else {
-        loginButton?.classList.remove('d-none');
-        userMenu?.classList.add('d-none');
-    }
-}
-
-async function loadUserFromSession() {
+// Load user session from storage
+export async function loadUserFromSession() {
     const savedUser = sessionStorage.getItem('user');
     if (savedUser) {
         state.currentUser = JSON.parse(savedUser);
@@ -97,7 +58,8 @@ async function loadUserFromSession() {
     }
 }
 
-async function login(username, password) {
+// Login function
+export async function login(username, password) {
     if (!validateCredentials(username, password)) {
         throw new Error('Invalid credentials');
     }
@@ -115,17 +77,19 @@ async function login(username, password) {
     }
 }
 
-function logout() {
+// Logout function
+export function logout() {
     state.currentUser = null;
     sessionStorage.removeItem('user');
-    updateAuthUI();
+    updateAuthUI(); // Update the UI to reflect the logged-out state
     showToast('Successfully logged out');
 }
 
-export async function handleLogin(username, password) {
+// Handle login/logout
+export function handleLogin(username, password) {
     try {
-        await login(username, password);
-    } catch(error) {
+        login(username, password);
+    } catch (error) {
         showError(error.message);
     }
 }
