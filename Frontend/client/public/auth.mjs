@@ -7,42 +7,46 @@ const defaultUsers = [
     { username: 'user1', password: 'pass1' }
 ];
 
-// Initialize authentication functionality
-document.addEventListener('DOMContentLoaded', () => {
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            
-            const username = document.getElementById('username')?.value;
-            const password = document.getElementById('password')?.value;
+// Check if running in the browser environment
+const isBrowser = typeof document !== 'undefined';
 
-            if (!validateCredentials(username, password)) {
-                showError('Please fill in all fields');
-                return;
-            }
+if (isBrowser) {
+    // Initialize authentication functionality
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                
+                const username = document.getElementById('username')?.value;
+                const password = document.getElementById('password')?.value;
 
-            try {
-                await login(username, password);
-                closeModal('loginModal');  // Close modal after successful login
-            } catch (error) {
-                showError(error.message);
-            }
-        });
-    }
+                if (!validateCredentials(username, password)) {
+                    showError('Please fill in all fields');
+                    return;
+                }
 
-    const logoutLink = document.getElementById('logoutLink');
-    if (logoutLink) {
-        logoutLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            handleLogout();
-        });
-    }
+                try {
+                    await login(username, password);
+                    closeModal('loginModal');  // Close modal after successful login
+                } catch (error) {
+                    showError(error.message);
+                }
+            });
+        }
 
-    // Load user session on page load
-    loadUserFromSession();
-});
+        const logoutLink = document.getElementById('logoutLink');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleLogout();
+            });
+        }
 
+        // Load user session on page load
+        loadUserFromSession();
+    });
+}
 
 // Validate credentials
 function validateCredentials(username, password) {
@@ -51,10 +55,12 @@ function validateCredentials(username, password) {
 
 // Load user session from storage
 export async function loadUserFromSession() {
-    const savedUser = sessionStorage.getItem('user');
-    if (savedUser) {
-        state.currentUser = JSON.parse(savedUser);
-        updateAuthUI();
+    if (isBrowser) {
+        const savedUser = sessionStorage.getItem('user');
+        if (savedUser) {
+            state.currentUser = JSON.parse(savedUser);
+            updateAuthUI();
+        }
     }
 }
 
@@ -69,7 +75,9 @@ export async function login(username, password) {
     
     if (user) {
         state.currentUser = { username: user.username };
-        sessionStorage.setItem('user', JSON.stringify(state.currentUser));
+        if (isBrowser) {
+            sessionStorage.setItem('user', JSON.stringify(state.currentUser));
+        }
         updateAuthUI();
         showToast('Successfully logged in!');
     } else {
@@ -80,7 +88,9 @@ export async function login(username, password) {
 // Logout function
 export function logout() {
     state.currentUser = null;
-    sessionStorage.removeItem('user');
+    if (isBrowser) {
+        sessionStorage.removeItem('user');
+    }
     updateAuthUI(); // Update the UI to reflect the logged-out state
     showToast('Successfully logged out');
 }

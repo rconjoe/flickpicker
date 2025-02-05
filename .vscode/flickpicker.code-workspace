@@ -1,10 +1,41 @@
 {
     "folders": [
-        {
-            "path": "."
-        }
+      {
+        "path": "."
+      },
+      {
+        "path": "Frontend"
+      },
+      {
+        "path": "Frontend/client"
+      },
+      {
+        "path": "Frontend/client/src"
+      },
+      {
+        "path": "Frontend/client/src/components"
+      },
+      {
+        "path": "Backend"
+      },
+      {
+        "path": "Data"
+      },
+      {
+        "path": "Tests"
+      }
     ],
-    "settings": {
-        "liveServer.settings.port": 5501
+    "launch": {
+      "version": "0.2.0",
+      "configurations": [
+        {
+          "name": "Frontend: Launch",
+          "type": "chrome",
+          "request": "launch",
+          "url": "http://localhost:5501",
+          "webRoot": "${workspaceFolder}/Frontend/client/src"
+        }
+      ]
     }
 }
+  

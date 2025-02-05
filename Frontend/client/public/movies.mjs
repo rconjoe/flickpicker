@@ -1,6 +1,9 @@
 import { state } from '../public/state.mjs';
 import { showError } from '../public/utils.mjs';
 
+// Check if running in the browser environment
+const isBrowser = typeof window !== 'undefined';
+
 export function createMovieCard(movie) {
     return `
         <div class="col">
@@ -46,6 +49,9 @@ export function createMovieCard(movie) {
 }
 
 export function updateMovieDisplay() {
+    // Check if running in the browser before manipulating the DOM
+    if (!isBrowser) return;
+
     const movieGrid = document.getElementById('movie-grid');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
     
@@ -90,6 +96,9 @@ export async function fetchLocalMovies() {
 }
 
 export function displayMovies(movies) {
+    // Only manipulate the DOM in the browser
+    if (!isBrowser) return;
+
     const movieGrid = document.getElementById('movie-grid');
     movieGrid.innerHTML = ''; // Clear existing content
 

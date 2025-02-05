@@ -1,11 +1,17 @@
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const bodyParser = require('body-parser');
-const app = express();
-const { updateMovieListJson } = require('../Frontend/client/public/script.mjs');
+import express from 'express';
+import path from 'path';
+import fs from 'fs/promises'; // Use 'fs/promises' for promise-based file operations
+import bodyParser from 'body-parser';
+import { updateMovieListJson } from '../Frontend/client/public/script.mjs';// Ensure this path is correct
 
-const filePath = path.join(__dirname, '..', 'Data', 'movieList.json');
+const app = express();
+
+// Use import.meta.url to get the current directory path
+const __filename = new URL(import.meta.url).pathname;
+const __dirname = path.dirname(__filename);
+
+const filePath = path.join(__dirname, 'Data', 'movieList.json');
+console.log('JSON file path:', filePath);
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
@@ -13,7 +19,7 @@ app.use(bodyParser.json());
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, '../Frontend/client/public')));
 
-const clientScript = require('../Frontend/client/script');
+const clientScript = import('../Frontend/client/public/script.mjs');  // If needed, you can use dynamic imports like this
 
 // Optional: Route to serve the main HTML file
 app.get('/', (req, res) => {
@@ -69,15 +75,15 @@ app.post('/save-movies', (req, res) => {
     const filePath = path.join(__dirname, 'Data', 'movieList.json');
 
     // Write the movie list to the JSON file
-    fs.writeFile(filePath, JSON.stringify(movieList, null, 2), (err) => {
-        if (err) {
+    fs.writeFile(filePath, JSON.stringify(movieList, null, 2))
+        .then(() => {
+            console.log('Movies saved successfully!');
+            return res.json({ success: true, message: 'Movies saved successfully' });
+        })
+        .catch(err => {
             console.error('Error saving movies:', err);
             return res.status(500).json({ success: false, message: 'Failed to save movies' });
-        }
-
-        console.log('Movies saved successfully!');
-        return res.json({ success: true, message: 'Movies saved successfully' });
-    });
+        });
 });
 
 const DEFAULT_PORT = 3000;
