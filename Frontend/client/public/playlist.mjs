@@ -36,7 +36,8 @@ export function initializePlaylist() {
 
 export function renderPlaylistContent() {
     const playlistContent = document.getElementById('playlistContent');
-    
+    if (!playlistContent) return;
+
     if (playlistState.items.length === 0) {
         playlistContent.innerHTML = `
             <div class="text-center py-5">
@@ -46,7 +47,7 @@ export function renderPlaylistContent() {
         `;
         return;
     }
-    
+
     playlistContent.innerHTML = `
         <div class="row g-3">
             ${playlistState.items.map(movie => `
@@ -75,19 +76,21 @@ export function renderPlaylistContent() {
 export function initializePlaylistUI() {
     // Add playlist button to navbar
     const navbarContent = document.querySelector('#navbarContent .ms-auto');
-    navbarContent.insertAdjacentHTML('beforebegin', `
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item dropdown">
-          <button class="btn btn-link nav-link position-relative" id="playlistButton">
-            <i class="fas fa-list"></i> Playlist
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary playlist-count">
-              ${playlistState.items.length}
-            </span>
-          </button>
-        </li>
-      </ul>
-    `);
-  
+    if (navbarContent) {
+        navbarContent.insertAdjacentHTML('beforebegin', `
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item dropdown">
+              <button class="btn btn-link nav-link position-relative" id="playlistButton">
+                <i class="fas fa-list"></i> Playlist
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary playlist-count">
+                  ${playlistState.items.length}
+                </span>
+              </button>
+            </li>
+          </ul>
+        `);
+    }
+
     // Add playlist modal
     document.body.insertAdjacentHTML('beforeend', `
       <div class="modal fade" id="playlistModal" tabindex="-1">
@@ -104,25 +107,25 @@ export function initializePlaylistUI() {
         </div>
       </div>
     `);
-  
+
     // Add toast container
     document.body.insertAdjacentHTML('beforeend', `
       <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
     `);
-  
+
     // Initialize playlist modal
     const playlistModal = new window.bootstrap.Modal(document.getElementById('playlistModal'));
-  
+
     // Add click handler for playlist button
     document.getElementById('playlistButton').addEventListener('click', () => {
-      playlistState.isOpen = true;
-      renderPlaylistContent();
-      playlistModal.show();
+        playlistState.isOpen = true;
+        renderPlaylistContent();
+        playlistModal.show();
     });
-  
+
     // Handle modal close
     document.getElementById('playlistModal').addEventListener('hidden.bs.modal', () => {
-      playlistState.isOpen = false;
+        playlistState.isOpen = false;
     });
 }
 
@@ -131,16 +134,16 @@ export function addToPlaylist(movieId, movieTitle, moviePoster) {
         showToast('Please log in to add to playlist', 'warning');
         return;
     }
-    
+
     // Check if movie already exists in playlist
     if (playlistState.items.some(item => item.id === movieId)) {
         showToast('Movie already in playlist', 'info');
         return;
     }
-    
+
     // Create a copy of the current state to avoid modifying the original object
     const newState = { ...playlistState };
-    
+
     // Add movie to playlist
     newState.items = [...newState.items, {
         id: movieId,
@@ -148,7 +151,7 @@ export function addToPlaylist(movieId, movieTitle, moviePoster) {
         poster: moviePoster,
         addedAt: new Date().toISOString()
     }];
-    
+
     // Save to localStorage
     try {
         localStorage.setItem('userPlaylist', JSON.stringify(newState.items));
@@ -157,11 +160,11 @@ export function addToPlaylist(movieId, movieTitle, moviePoster) {
         showToast('Failed to save to playlist', 'error');
         return;
     }
-    
+
     // Update UI
     updatePlaylistBadge();
     showToast('Added to playlist successfully', 'success');
-    
+
     // If playlist is open, refresh its content
     if (playlistState.isOpen) {
         renderPlaylistContent();
