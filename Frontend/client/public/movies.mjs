@@ -4,11 +4,12 @@ import { showError } from '../public/utils.mjs';
 // Check if running in the browser environment
 const isBrowser = typeof window !== 'undefined';
 
-export function createMovieCard(movie) {
+// Helper function to create movie card HTML
+function createMovieCardHTML(movie) {
     return `
         <div class="col">
             <div class="card h-100" data-movie-id="${movie.id}">
-                <img src="${movie.imageUrl}" class="card-img-top" alt="${movie.title}" 
+                <img src="${movie.imageUrl}" class="card-img-top" alt="${movie.title}" loading="lazy" 
                      onerror="this.src=''">
                 <div class="card-body">
                     <h5 class="card-title">${movie.title}</h5>
@@ -48,20 +49,24 @@ export function createMovieCard(movie) {
     `;
 }
 
+export function createMovieCard(movie) {
+    return createMovieCardHTML(movie);
+}
+
 export function updateMovieDisplay() {
     // Check if running in the browser before manipulating the DOM
     if (!isBrowser) return;
 
     const movieGrid = document.getElementById('movie-grid');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
-    
+
     if (loadingPlaceholder) loadingPlaceholder.style.display = 'none';
-    
+
     if (state.filteredMovies.length === 0) {
         movieGrid.innerHTML = '<div class="col-12 text-center"><p>No movies found matching your criteria.</p></div>';
         return;
     }
-    
+
     movieGrid.innerHTML = state.filteredMovies.map(movie => createMovieCard(movie)).join('');
 }
 
@@ -70,7 +75,7 @@ export async function fetchMovies() {
     try {
         const response = await fetch('/Data/movieList.json'); // Path to the static JSON served by your backend
         if (!response.ok) throw new Error('Failed to fetch movies');
-        
+
         state.movies = await response.json();
         state.filteredMovies = [...state.movies];
         updateMovieDisplay();
@@ -84,7 +89,7 @@ export async function fetchLocalMovies() {
     try {
         const response = await fetch('/Data/movieList.json'); // Same path as above
         if (!response.ok) throw new Error('Failed to fetch local movies');
-        
+
         state.movies = await response.json();
         state.filteredMovies = [...state.movies];
         updateMovieDisplay();
@@ -107,18 +112,7 @@ export function displayMovies(movies) {
         const movieCard = document.createElement('div');
         movieCard.classList.add('col', 'mb-4');
 
-        movieCard.innerHTML = `
-            <div class="card">
-                <img src="${movie.imageUrl}" class="card-img-top" alt="${movie.title}">
-                <div class="card-body">
-                    <h5 class="card-title">${movie.title}</h5>
-                    <p class="card-text">Year: ${movie.year}</p>
-                    <p class="card-text">Category: ${movie.category}</p>
-                    <p class="card-text">Watched: ${movie.watched ? "Yes" : "No"}</p>
-                    <a href="${movie.trailerLink}" class="btn btn-primary" target="_blank">Watch Trailer</a>
-                </div>
-            </div>
-        `;
+        movieCard.innerHTML = createMovieCardHTML(movie);
 
         movieGrid.appendChild(movieCard);
     });
