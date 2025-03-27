@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": { "type": "integer" },
+      "title": { "type": "string" },
+      "dateWatched": { "type": "string", "format": "date" },
+      "watched": { "type": "boolean" },
+      "trailerLink": { "type": "string", "format": "uri" },
+      "movieLink": { "type": "string", "format": "uri" },
+      "modernTrailerLink": { "type": "string", "format": "uri" },
+      "requestedBy": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "username": { "type": "string" },
+          "platform": { "type": "string" }
+        },
+        "required": ["userId", "username", "platform"]
+      },
+      "category": { "type": "string" },
+      "trailerPrivate": { "type": "boolean" },
+      "moviePrivate": { "type": "boolean" },
+      "year": { "type": "integer", "minimum": 1888 },
+      "subtitles": { "type": "boolean" },
+      "language": { "type": "string" },
+      "voteCount": { "type": "integer" },
+      "imageUrl": { "type": "string", "format": "uri" },
+      "runtime": { "type": "string" },
+      "ratings": { "type": "string" }
+    },
+    "required": ["id", "title", "watched", "trailerLink", "requestedBy", "year", "subtitles", "language", "voteCount", "imageUrl"]
+  }
+}
