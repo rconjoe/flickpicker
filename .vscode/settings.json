@@ -3066,7 +3066,8 @@
 	},
 	// Configure settings to be overridden for the javascript language.
 	"[javascript]": {
-		"editor.maxTokenizationLineLength": 2500
+		"editor.maxTokenizationLineLength": 2500,
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	// Configure settings to be overridden for the json language.
 	"[json]": {

@@ -1,13 +1,13 @@
-import { playlistState, state } from '../public/state.mjs';
-import { showError, showToast } from '../public/utils.mjs';
-import { login, logout, isAuthenticated, loadUserFromSession } from '../public/auth.mjs';
-import { initializePlaylist, initializePlaylistUI, addToPlaylist } from '../public/playlist.mjs';
+import { state } from '../public/state.mjs';
+import { showToast } from '../public/utils.mjs';
+import { login, logout, isAuthenticated } from '../public/auth.mjs';
+import { addToPlaylist } from '../public/playlist.mjs';
 import { searchMovies } from '../public/search.mjs';
-import { fetchMovies, displayMovies, updateMovieDisplay } from '../public/movies.mjs';
+import { displayMovies, updateMovieDisplay } from '../public/movies.mjs';
 
 const isBrowser = typeof window !== 'undefined';
 
-const movies = isBrowser ? JSON.parse(localStorage.getItem('movieList')) || [] : [];
+const movies = isBrowser ? (localStorage.getItem('movieList') ? JSON.parse(localStorage.getItem('movieList')) : []) : [];
 
 if (isBrowser) {
     // Initial display (show all movies on page load)
@@ -29,7 +29,7 @@ export function applyFilters() {
         const sortOrder = document.getElementById('sort-order').value;
         
         state.filteredMovies = state.movies.filter(movie => {
-            const genreMatch = !genre || movie.category.toLowerCase().includes(genre);
+            const genreMatch = !genre || (movie.category && movie.category.toLowerCase().includes(genre));
             const yearMatch = !year || movie.year.toString() === year;
             const ratingMatch = !rating || movie.rating === rating;
             return genreMatch && yearMatch && ratingMatch;
@@ -48,7 +48,7 @@ export function sortMovies(criteria) {
             case 'year':
                 return b.year - a.year;
             case 'runtime':
-                return parseFloat(a.runtime) - parseFloat(b.runtime);
+                return (parseFloat(a.runtime) || 0) - (parseFloat(b.runtime) || 0);
             default:
                 return 0;
         }
@@ -56,7 +56,7 @@ export function sortMovies(criteria) {
 }
 
 export async function saveMoviesToFile() {
-    const movieList = isBrowser ? JSON.parse(localStorage.getItem('movieList')) || [] : [];
+    const movieList = isBrowser ? (localStorage.getItem('movieList') ? JSON.parse(localStorage.getItem('movieList')) : []) : [];
 
     // Send the data to the server using fetch
     fetch('http://localhost:3000/save-movies', {
@@ -96,7 +96,7 @@ export function handleMovieInteraction(event) {
 }
 
 export function handleVote(movieId, voteType) {
-    if (!state.currentUser) {
+    if (!state.currentUser || !state.currentUser.id || !state.currentUser.username) {
         showToast('Please log in to vote', 'warning');
         return;
     }
@@ -120,6 +120,8 @@ export async function handleAddMovie(event) {
         trailerLink: document.getElementById('trailerLink').value,
         movieLink: document.getElementById('movieLink').value,
         modernTrailerLink: document.getElementById('modernTrailerLink').value,
+        tmdbLink: document.getElementById('tmdbLink').value,
+        imdbLink: document.getElementById('imdbLink').value,
         requestedBy: {
             userId: state.currentUser?.id || 'anonymous',
             username: document.getElementById('requestedBy').value,
@@ -216,7 +218,7 @@ export function validateMovieData(data) {
         data.imdbLink && // IMDB Link is required
         data.tmdbLink && // TMDB Link is required
         !isNaN(data.year) && // Year should be a number
-        (data.subtitles === 'true' || data.subtitles === 'false') // Subtitles should be boolean
+        (typeof data.subtitles === 'boolean') // Subtitles should be boolean
     );
 }
 
@@ -235,7 +237,7 @@ if (isBrowser && 'serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
         try {
             const registration = await navigator.serviceWorker.register('../../../service-worker.js', {
-                scope: '/'
+                scope: location.pathname.replace(/\/[^/]*$/, '/') // Dynamically set scope based on current path
             });
             console.log('Service Worker registered with scope:', registration.scope);
         } catch (error) {
@@ -243,8 +245,10 @@ if (isBrowser && 'serviceWorker' in navigator) {
         }
     });
 }
+    
+    
 
-if (isBrowser) {
+if (isBrowser) 
     document.addEventListener('DOMContentLoaded', function() {
         // Settings modal
         const settingsLink = document.getElementById('settingsLink');
@@ -269,34 +273,72 @@ if (isBrowser) {
         // Add movie button visibility
         const addMovieButton = document.getElementById('addMovieButton');
         if (addMovieButton) {
-            addMovieButton.style.display = isAuthenticated() ? 'block' : 'none';
+            try {
+                addMovieButton.style.display = isAuthenticated() ? 'block' : 'none';
+            } catch (error) {
+                console.error('Error checking authentication:', error);
+                addMovieButton.style.display = 'none'; // Default to hiding the button
+            }
         }
 
         // Event listeners for filters, login, and movie interactions
-        initializeEventListeners();
-    });
-}
+        // Initialize event listeners for filters, login, and movie interactions
+        document.querySelectorAll('#filter-section select').forEach(select => {
+            select.addEventListener('change', applyFilters);
+        });
 
-export function initializeEventListeners() {
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', () => {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                login(username, password);
+            });
+        }
+
+        const logoutLink = document.getElementById('logoutLink');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', logout);
+        }
+
+        const movieGrid = document.getElementById('movie-grid');
+        if (movieGrid) {
+            movieGrid.addEventListener('click', handleMovieInteraction);
+        }
+    });
+        const filterSelects = document.querySelectorAll('#filter-section select');
+        if (filterSelects) {
+            filterSelects.forEach(select => {
+                select.addEventListener('change', applyFilters);
+            });
+        }
     if (isBrowser) {
         // Filter listeners
         document.querySelectorAll('#filter-section select').forEach(select => {
             select.addEventListener('change', applyFilters);
         });
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', () => {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                login(username, password);
+            });
+        }
+        const logoutLink = document.getElementById('logoutLink');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', logout);
+        }
         
-        // Auth listeners
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            login(username, password);
-        });
-        
-        document.getElementById('logoutLink').addEventListener('click', logout);
+        const movieGrid = document.getElementById('movie-grid');
+        if (movieGrid) {
+            movieGrid.addEventListener('click', handleMovieInteraction);
+        }
         
         // Movie interaction listeners
         document.getElementById('movie-grid').addEventListener('click', handleMovieInteraction);
     }
-}
+
 
 if (isBrowser) {
     document.getElementById('saveSettingsBtn').addEventListener('click', function() {
@@ -316,16 +358,19 @@ if (isBrowser) {
             feedback
         });
 
-        const modal = window.bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
-        modal.hide();
-    });
-
+        window.bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
     document.getElementById('togglePassword').addEventListener('click', function() {
         const passwordField = document.getElementById('password');
         const eyeIcon = document.getElementById('eyeIcon');
-        const type = passwordField.type === 'password' ? 'text' : 'password';
-        passwordField.type = type;
-        eyeIcon.classList.toggle('fa-eye-slash');
-        eyeIcon.classList.toggle('fa-eye');
+        if (passwordField && eyeIcon) {
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+            eyeIcon.classList.toggle('fa-eye-slash');
+            eyeIcon.classList.toggle('fa-eye');
+        } else {
+            console.error('Password field or eye icon not found.');
+        }
     });
-}
+    eyeIcon.classList.toggle('fa-eye-slash');
+    eyeIcon.classList.toggle('fa-eye');
+})};

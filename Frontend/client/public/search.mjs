@@ -1,50 +1,48 @@
-import { displayMovies } from '../public/movies.mjs';
+// Safeguard: Ensure this code runs only in a browser context
+if (typeof window === 'undefined' || typeof document === 'undefined') {
+    throw new Error('search.mjs is intended to be executed in a browser environment only.');
+}
 
-/**
- * Searches for movies based on the user input.
- * Retrieves the movie list from localStorage and filters it.
- * Displays the filtered movies.
- */
+// Import the displayMovies function from movies.mjs
+import { displayMovies } from './movies.mjs';
+
 export function searchMovies() {
-    try {
-        // Get the search term
-        const searchTerm = document.getElementById('movieSearch').value.trim().toLowerCase();
-
-        // Validate the search term
-        if (!searchTerm) {
-            displayMovies([]);
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('movieSearch');
+        if (!searchInput) {
+            console.error('Element with ID "movieSearch" not found.');
             return;
         }
 
-        // Retrieve the list of movies from localStorage
-        const movieList = JSON.parse(localStorage.getItem('movieList')) || [];
+        // Debounced search functionality for smoother interaction
+        const debounce = (func, wait) => {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        };
 
-        // Filter movies based on the search term
-        const filteredMovies = movieList.filter(movie => 
-            movie.title.toLowerCase().includes(searchTerm)
-        );
+        const debouncedSearch = debounce(() => {
+            const searchTerm = searchInput.value.trim().toLowerCase();
 
-        // Display the filtered movies
-        displayMovies(filteredMovies);
-    } catch (error) {
-        console.error('Error searching movies:', error);
-        displayMovies([]);
-    }
+            // Validate the search term
+            if (!searchTerm) {
+                displayMovies([]); // Clear display if no search term
+                return;
+            }
+
+            // Fetch filtered results from the server
+            fetch(`/search-movies?query=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(filteredMovies => {
+                    displayMovies(filteredMovies); // Render movies on the page
+                })
+                .catch(error => {
+                    console.error('Error fetching movies:', error);
+                });
+        }, 300); // Set debounce delay (300ms)
+
+        searchInput.addEventListener('input', debouncedSearch);
+    });
 }
-
-/**
- * Debounces a function to delay its execution.
- * @param {Function} func - The function to debounce.
- * @param {number} wait - The delay in milliseconds.
- * @returns {Function} - The debounced function.
- */
-function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-}
-
-// Add event listener for the search input with debounce
-document.getElementById('movieSearch').addEventListener('input', debounce(searchMovies, 300));
