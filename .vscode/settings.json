@@ -3058,7 +3058,7 @@
 	// Configure settings to be overridden for the html language.
 	"[html]": {
 		"editor.suggest.insertMode": "replace",
-		"editor.defaultFormatter": "mohd-akram.vscode-html-format"
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	// Configure settings to be overridden for the jade language.
 	"[jade]": {

@@ -2,7 +2,7 @@
 import { showError } from './utils.mjs'; // Optional: Error handling utility
 
 // Path to the movieList.json file
-const JSON_FILE_PATH = "movieList.json";
+const JSON_FILE_PATH = "../Data/movieList.json";
 
 // Cache DOM elements
 const cachedElements = {
@@ -80,11 +80,28 @@ function loadFromSessionStorage() {
 async function loadFromIndexedDB() {
     const dbName = 'MovieDB';
     const storeName = 'Movies';
+
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open(dbName);
+        const request = indexedDB.open(dbName, 1); // Pass a version number to trigger `onupgradeneeded`
+
+        request.onupgradeneeded = function (event) {
+            const db = event.target.result;
+
+            // Check if the object store already exists
+            if (!db.objectStoreNames.contains(storeName)) {
+                db.createObjectStore(storeName, { keyPath: 'id' }); // Use `id` as the primary key
+            }
+        };
 
         request.onsuccess = function (event) {
             const db = event.target.result;
+
+            // Verify the object store existence before making the transaction
+            if (!db.objectStoreNames.contains(storeName)) {
+                reject(new Error(`Object store "${storeName}" does not exist in database "${dbName}".`));
+                return;
+            }
+
             const transaction = db.transaction([storeName], 'readonly');
             const store = transaction.objectStore(storeName);
             const allRequest = store.getAll();
@@ -94,15 +111,69 @@ async function loadFromIndexedDB() {
             };
 
             allRequest.onerror = function () {
-                reject(new Error('IndexedDB error'));
+                reject(new Error('IndexedDB error while fetching data.'));
             };
         };
 
         request.onerror = function () {
-            reject(new Error('Failed to open IndexedDB'));
+            reject(new Error('Failed to open IndexedDB.'));
         };
     });
 }
+
+// Populate IndexedDB (conditional execution)
+async function populateIndexedDB() {
+    const dbName = 'MovieDB';
+    const storeName = 'Movies';
+    const movieData = [
+        // Example movie data
+        { id: 1, title: 'Inception', year: 2010, runtime: '148 min', requestedBy: { username: 'Alice', platform: 'Web' }, trailerLink: 'https://example.com/inception', imageUrl: '/path/to/image.jpg' },
+        { id: 2, title: 'The Matrix', year: 1999, runtime: '136 min', requestedBy: { username: 'Bob', platform: 'Mobile' }, trailerLink: 'https://example.com/matrix', imageUrl: '/path/to/image.jpg' },
+    ];
+
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName, 1);
+
+        request.onsuccess = function (event) {
+            const db = event.target.result;
+
+            const transaction = db.transaction([storeName], 'readonly');
+            const store = transaction.objectStore(storeName);
+            const checkRequest = store.count();
+
+            checkRequest.onsuccess = function () {
+                if (checkRequest.result === 0) {
+                    // Populate only if store is empty
+                    const writeTransaction = db.transaction([storeName], 'readwrite');
+                    const writeStore = writeTransaction.objectStore(storeName);
+
+                    movieData.forEach(movie => writeStore.add(movie));
+
+                    writeTransaction.oncomplete = function () {
+                        resolve('Movies added to IndexedDB.');
+                    };
+
+                    writeTransaction.onerror = function () {
+                        reject(new Error('Failed to populate IndexedDB.'));
+                    };
+                } else {
+                    resolve('IndexedDB already contains data.');
+                }
+            };
+
+            checkRequest.onerror = function () {
+                reject(new Error('Failed to verify IndexedDB content.'));
+            };
+        };
+
+        request.onerror = function () {
+            reject(new Error('Failed to open IndexedDB.'));
+        };
+    });
+}
+
+// Call populateIndexedDB() once to populate the database (if empty)
+populateIndexedDB().catch(error => console.error(error.message));
 
 // Load movies from cookies
 function loadFromCookies() {
@@ -136,6 +207,11 @@ async function loadFromJson() {
 
 // Render movies to the HTML div
 function renderMovies(movies) {
+    if (!cachedElements.movieGrid) {
+        console.error('Failed to find movie grid element.');
+        return;
+    }
+
     cachedElements.movieGrid.innerHTML = ''; // Clear existing content
 
     movies.forEach(movie => {

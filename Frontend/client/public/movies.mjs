@@ -1,26 +1,30 @@
 import { state } from '../public/state.mjs';
 import { showError } from '../public/utils.mjs';
 
-// Check if running in the browser environment
+// Check if running in a browser environment
 const isBrowser = typeof window !== 'undefined';
 
 // Helper function to create movie card HTML
 function createMovieCardHTML(movie) {
+    const fallbackImage = '/path/to/default.jpg';
     return `
         <div class="col">
             <div class="card h-100" data-movie-id="${movie.id}">
-                <img src="${movie.imageUrl}" class="card-img-top" alt="${movie.title}" loading="lazy" 
-                     onerror="this.src=''">
+                <img src="${movie.imageUrl || fallbackImage}" 
+                     class="card-img-top" alt="${movie.title || 'Movie Poster'}" loading="lazy"
+                     onerror="this.src='${fallbackImage}'">
                 <div class="card-body">
-                    <h5 class="card-title">${movie.title}</h5>
+                    <h5 class="card-title">${movie.title || 'Untitled Movie'}</h5>
                     <p class="card-text">
                         <small class="text-muted">
-                            ${movie.year} • ${movie.runtime} • ${movie.rating}
+                            ${movie.year || 'Unknown Year'} • ${movie.runtime || 'Unknown Runtime'} • ${movie.ratings || 'Unrated'}
                         </small>
                     </p>
-                    <p class="card-text">${movie.category}</p>
+                    <p class="card-text">${movie.category || 'General'}</p>
                     <p class="card-text">
-                        <small class="text-muted">Requested by ${movie.requestedBy.username}</small>
+                        <small class="text-muted">
+                            Requested by ${movie.requestedBy?.username || 'Unknown User'}
+                        </small>
                     </p>
                 </div>
                 <div class="card-footer">
@@ -29,7 +33,7 @@ function createMovieCardHTML(movie) {
                             <button type="button" class="btn btn-sm btn-outline-primary vote-btn" 
                                     data-vote="up" ${state.currentUser ? '' : 'disabled'}>
                                 <i class="fas fa-thumbs-up"></i> 
-                                <span class="vote-count">${movie.voteCount}</span>
+                                <span class="vote-count">${movie.voteCount || 0}</span>
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-primary" 
                                     onclick="showMovieDetails('${movie.id}')">
@@ -49,71 +53,51 @@ function createMovieCardHTML(movie) {
     `;
 }
 
-export function createMovieCard(movie) {
-    return createMovieCardHTML(movie);
-}
-
-export function updateMovieDisplay() {
-    // Check if running in the browser before manipulating the DOM
+// Update movie display dynamically
+function updateMovieDisplay() {
     if (!isBrowser) return;
 
     const movieGrid = document.getElementById('movie-grid');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
 
+    // Hide loading placeholder
     if (loadingPlaceholder) loadingPlaceholder.style.display = 'none';
 
-    if (state.filteredMovies.length === 0) {
-        movieGrid.innerHTML = '<div class="col-12 text-center"><p>No movies found matching your criteria.</p></div>';
+    // Show fallback message if no movies are found
+    if (!state.filteredMovies || state.filteredMovies.length === 0) {
+        movieGrid.innerHTML = `
+            <div class="col-12 text-center">
+                <p>No movies found matching your criteria.</p>
+            </div>
+        `;
         return;
     }
 
-    movieGrid.innerHTML = state.filteredMovies.map(movie => createMovieCard(movie)).join('');
+    // Render movie cards dynamically
+    movieGrid.innerHTML = state.filteredMovies.map(createMovieCardHTML).join('');
 }
 
-// Movie fetching and display
-export async function fetchMovies() {
+// Unified fetch function with fallback
+async function fetchMovies(source = '../Data/movieList.json') {
     try {
-        const response = await fetch('/Data/movieList.json'); // Path to the static JSON served by your backend
+        const response = await fetch(source);
         if (!response.ok) throw new Error('Failed to fetch movies');
 
-        state.movies = await response.json();
-        state.filteredMovies = [...state.movies];
-        updateMovieDisplay();
+        const movies = await response.json();
+        state.movies = movies;
+        state.filteredMovies = [...movies]; // Default filtered list
+        updateMovieDisplay(); // Update UI after fetching
     } catch (error) {
         console.error('Error fetching movies:', error);
-        fetchLocalMovies();
+        showError('Failed to fetch movies. Please try again later.');
     }
 }
 
-export async function fetchLocalMovies() {
-    try {
-        const response = await fetch('/Data/movieList.json'); // Same path as above
-        if (!response.ok) throw new Error('Failed to fetch local movies');
-
-        state.movies = await response.json();
-        state.filteredMovies = [...state.movies];
-        updateMovieDisplay();
-        showError('API is down, using local data.');
-    } catch (error) {
-        console.error('Error fetching local movies:', error);
-        showError('Failed to load movies. Please try again later.');
-    }
-}
-
-export function displayMovies(movies) {
-    // Only manipulate the DOM in the browser
+// Explicit function to display movies (wrapper around updateMovieDisplay)
+function displayMovies() {
     if (!isBrowser) return;
-
-    const movieGrid = document.getElementById('movie-grid');
-    movieGrid.innerHTML = ''; // Clear existing content
-
-    // Loop through the movies and create HTML elements to display them
-    movies.forEach(movie => {
-        const movieCard = document.createElement('div');
-        movieCard.classList.add('col', 'mb-4');
-
-        movieCard.innerHTML = createMovieCardHTML(movie);
-
-        movieGrid.appendChild(movieCard);
-    });
+    updateMovieDisplay();
 }
+
+// Export module functions, including displayMovies
+export { createMovieCardHTML, updateMovieDisplay, fetchMovies, displayMovies };
