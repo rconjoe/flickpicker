@@ -1,109 +1,108 @@
+// Import dependencies
 import { state } from './state.mjs';
 import { showToast, showError } from './utils.mjs';
 import { updateAuthUI, closeModal } from './ui.mjs';
 
-// Default test user
+// Default test users
 const defaultUsers = [
-    { username: 'user1', password: 'pass1' }
+    { username: 'user1', password: 'pass1' },
+    { username: 'admin', password: 'admin123' }
 ];
 
-// Check if running in the browser environment
-const isBrowser = typeof document !== 'undefined';
+// Cached DOM elements for performance optimization
+const cachedElements = {};
 
-if (isBrowser) {
-    // Initialize authentication functionality
-    document.addEventListener('DOMContentLoaded', () => {
-        const loginBtn = document.getElementById('loginBtn');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                
-                const username = document.getElementById('username')?.value;
-                const password = document.getElementById('password')?.value;
-
-                if (!validateCredentials(username, password)) {
-                    showError('Please fill in all fields');
-                    return;
-                }
-
-                try {
-                    await login(username, password);
-                    closeModal('loginModal');  // Close modal after successful login
-                } catch (error) {
-                    showError(error.message);
-                }
-            });
-        }
-
-        const logoutLink = document.getElementById('logoutLink');
-        if (logoutLink) {
-            logoutLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                handleLogout();
-            });
-        }
-
-        // Load user session on page load
-        loadUserFromSession();
-    });
+// Cache commonly accessed DOM elements
+function cacheDOM() {
+    cachedElements.loginBtn = document.getElementById('loginBtn');
+    cachedElements.usernameInput = document.getElementById('username');
+    cachedElements.passwordInput = document.getElementById('password');
+    cachedElements.logoutLink = document.getElementById('logoutLink');
 }
 
-// Validate credentials
+// Attach event listeners to the DOM elements
+function attachEventListeners() {
+    // Login Button
+    if (cachedElements.loginBtn) {
+        cachedElements.loginBtn.addEventListener('click', debounce(async (e) => {
+            e.preventDefault();
+            const username = cachedElements.usernameInput?.value;
+            const password = cachedElements.passwordInput?.value;
+
+            if (!validateCredentials(username, password)) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            try {
+                await login(username, password);
+                closeModal('loginModal'); // Close modal upon successful login
+            } catch (error) {
+                showError(error.message);
+            }
+        }, 300)); // Debounce to prevent rapid button clicks
+    }
+
+    // Logout Link
+    if (cachedElements.logoutLink) {
+        cachedElements.logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleLogout();
+        });
+    }
+}
+
+// Validate user credentials
 function validateCredentials(username, password) {
     return !!username?.trim() && !!password?.trim();
 }
 
-// Load user session from storage
-export async function loadUserFromSession() {
-    if (isBrowser) {
-        const savedUser = sessionStorage.getItem('user');
-        if (savedUser) {
-            state.currentUser = JSON.parse(savedUser);
-            updateAuthUI();
-        }
-    }
-}
-
 // Login function
 export async function login(username, password) {
-    if (!validateCredentials(username, password)) {
-        throw new Error('Invalid credentials');
-    }
+    const loginBtn = cachedElements.loginBtn;
+    if (loginBtn) loginBtn.disabled = true; // Disable button to prevent multiple clicks
 
-    // Check against default test user
-    const user = defaultUsers.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-        state.currentUser = { username: user.username };
-        if (isBrowser) {
+    try {
+        showToast('Authenticating...');
+        const user = defaultUsers.find(u => u.username === username && u.password === password);
+
+        if (user) {
+            state.currentUser = { username: user.username };
+
+            // Save user session to sessionStorage
             sessionStorage.setItem('user', JSON.stringify(state.currentUser));
+
+            updateAuthUI();
+            showToast(`Welcome, ${user.username}!`);
+        } else {
+            throw new Error('Invalid credentials');
         }
-        updateAuthUI();
-        showToast('Successfully logged in!');
-    } else {
-        throw new Error('Invalid credentials');
+    } finally {
+        if (loginBtn) loginBtn.disabled = false; // Re-enable button after processing
     }
 }
 
 // Logout function
 export function logout() {
     state.currentUser = null;
-    if (isBrowser) {
-        sessionStorage.removeItem('user');
-    }
-    updateAuthUI(); // Update the UI to reflect the logged-out state
-    showToast('Successfully logged out');
+
+    // Remove user session from sessionStorage
+    sessionStorage.removeItem('user');
+
+    updateAuthUI(); // Update UI after logout
+    showToast('You have logged out successfully');
 }
 
-// Handle login/logout
-export function handleLogin(username, password) {
-    try {
-        login(username, password);
-    } catch (error) {
-        showError(error.message);
+// Load user session from storage
+export function loadUserFromSession() {
+    const savedUser = sessionStorage.getItem('user');
+    if (savedUser) {
+        state.currentUser = JSON.parse(savedUser);
+        updateAuthUI();
     }
 }
 
+// Handle login/logout logic
 export function handleLogout() {
     logout();
 }
@@ -111,3 +110,24 @@ export function handleLogout() {
 export function isAuthenticated() {
     return !!state.currentUser;
 }
+
+// Debounce utility function to optimize event handling
+function debounce(fn, delay) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+// Initialize authentication module
+export function initializeAuth() {
+    cacheDOM(); // Cache DOM elements
+    attachEventListeners(); // Attach event listeners
+    loadUserFromSession(); // Load session on page load
+}
+
+// Event listener for page load
+document.addEventListener('DOMContentLoaded', () => {
+    initializeAuth();
+});
