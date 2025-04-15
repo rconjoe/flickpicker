@@ -57,11 +57,21 @@ export async function loadMovies() {
             movies = await loadFromJson();
         }
 
+        // Deduplicate movies
+        movies = deduplicateMovies(movies);
+
         // Render the movies to the HTML div
         renderMovies(movies);
     } catch (error) {
         showError(`Failed to load movies: ${error.message}`);
     }
+}
+
+// Deduplicate movies
+function deduplicateMovies(movies) {
+    const movieMap = new Map();
+    movies.forEach(movie => movieMap.set(movie.id, movie));
+    return Array.from(movieMap.values());
 }
 
 // Load movies from local storage
@@ -82,21 +92,20 @@ async function loadFromIndexedDB() {
     const storeName = 'Movies';
 
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open(dbName, 1); // Pass a version number to trigger `onupgradeneeded`
+        const request = indexedDB.open(dbName, 1);
 
         request.onupgradeneeded = function (event) {
             const db = event.target.result;
 
-            // Check if the object store already exists
+            // Create the object store if it doesn't already exist
             if (!db.objectStoreNames.contains(storeName)) {
-                db.createObjectStore(storeName, { keyPath: 'id' }); // Use `id` as the primary key
+                db.createObjectStore(storeName, { keyPath: 'id' });
             }
         };
 
         request.onsuccess = function (event) {
             const db = event.target.result;
 
-            // Verify the object store existence before making the transaction
             if (!db.objectStoreNames.contains(storeName)) {
                 reject(new Error(`Object store "${storeName}" does not exist in database "${dbName}".`));
                 return;
@@ -121,60 +130,6 @@ async function loadFromIndexedDB() {
     });
 }
 
-// Populate IndexedDB (conditional execution)
-async function populateIndexedDB() {
-    const dbName = 'MovieDB';
-    const storeName = 'Movies';
-    const movieData = [
-        // Example movie data
-        { id: 1, title: 'Inception', year: 2010, runtime: '148 min', requestedBy: { username: 'Alice', platform: 'Web' }, trailerLink: 'https://example.com/inception', imageUrl: '/path/to/image.jpg' },
-        { id: 2, title: 'The Matrix', year: 1999, runtime: '136 min', requestedBy: { username: 'Bob', platform: 'Mobile' }, trailerLink: 'https://example.com/matrix', imageUrl: '/path/to/image.jpg' },
-    ];
-
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(dbName, 1);
-
-        request.onsuccess = function (event) {
-            const db = event.target.result;
-
-            const transaction = db.transaction([storeName], 'readonly');
-            const store = transaction.objectStore(storeName);
-            const checkRequest = store.count();
-
-            checkRequest.onsuccess = function () {
-                if (checkRequest.result === 0) {
-                    // Populate only if store is empty
-                    const writeTransaction = db.transaction([storeName], 'readwrite');
-                    const writeStore = writeTransaction.objectStore(storeName);
-
-                    movieData.forEach(movie => writeStore.add(movie));
-
-                    writeTransaction.oncomplete = function () {
-                        resolve('Movies added to IndexedDB.');
-                    };
-
-                    writeTransaction.onerror = function () {
-                        reject(new Error('Failed to populate IndexedDB.'));
-                    };
-                } else {
-                    resolve('IndexedDB already contains data.');
-                }
-            };
-
-            checkRequest.onerror = function () {
-                reject(new Error('Failed to verify IndexedDB content.'));
-            };
-        };
-
-        request.onerror = function () {
-            reject(new Error('Failed to open IndexedDB.'));
-        };
-    });
-}
-
-// Call populateIndexedDB() once to populate the database (if empty)
-populateIndexedDB().catch(error => console.error(error.message));
-
 // Load movies from cookies
 function loadFromCookies() {
     const cookie = document.cookie.split('; ').find(row => row.startsWith('movieList='));
@@ -198,11 +153,16 @@ async function loadFromCacheStorage() {
 
 // Load movies from JSON file served from localhost
 async function loadFromJson() {
-    const response = await fetch('http://localhost:3000/movieList.json');
-    if (!response.ok) {
-        throw new Error(`Failed to fetch JSON: ${response.statusText}`);
+    try {
+        const response = await fetch('http://localhost:3000/movieList.json');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch JSON: ${response.statusText}`);
+        }
+        return response.json();
+    } catch (error) {
+        console.error('Error loading JSON file:', error);
+        return [];
     }
-    return response.json();
 }
 
 // Render movies to the HTML div
@@ -213,6 +173,11 @@ function renderMovies(movies) {
     }
 
     cachedElements.movieGrid.innerHTML = ''; // Clear existing content
+
+    if (!movies.length) {
+        cachedElements.movieGrid.innerHTML = '<p>No movies available.</p>';
+        return;
+    }
 
     movies.forEach(movie => {
         const movieCard = `
