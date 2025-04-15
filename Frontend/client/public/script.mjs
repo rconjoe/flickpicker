@@ -80,6 +80,48 @@ export async function saveMoviesToFile() {
     });
 }
 
+export async function loadMovieFromFile() {
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput.files.length === 0) {
+        alert('Please select a file to upload.');
+        return;
+    }
+        
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = async function(event) {
+        const fileContent = event.target.result;
+        try {
+            const movies = JSON.parse(fileContent);
+            if (!Array.isArray(movies)) {
+                throw new Error('Invalid file format. Expected an array of movies.');
+            }
+            
+            // Validate each movie object
+            for (const movie of movies) {
+                if (!validateMovieData(movie)) {
+                    throw new Error(`Invalid movie data: ${JSON.stringify(movie)}`);
+                }
+            }
+
+            // Update the state and UI
+            state.movies = movies;
+            state.filteredMovies = [...state.movies];
+            updateMovieDisplay();
+            
+            alert('Movies loaded successfully!');
+        } catch (error) {
+            console.error('Error loading movies:', error);
+            alert('Failed to load movies. Please check the file format.');
+        }
+    };
+    reader.onerror = function() {
+        console.error('Error reading file:', reader.error);
+        alert('Error reading file. Please try again.');
+    };
+    reader.readAsText(file);loadMovieFromFile
+}
+
 export function handleMovieInteraction(event) {
     const target = event.target;
     const movieCard = target.closest('.card');

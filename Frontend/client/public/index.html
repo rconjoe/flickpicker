@@ -44,7 +44,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta http-equiv="content-language" content="en-US">
     <link rel="canonical" href="https://yourdomain.com/page-url">
-    <meta name="msapplication-config" content="/browserconfig.xml">
+    <meta name="msapplication-config" content="../browserconfig.xml">
 
     <meta property="og:title" content="FlickPicker - Movie Night Tracking Application">
     <meta property="og:description" content="A Discord bot and website for voting on movies to watch during streaming sessions.">
@@ -59,81 +59,80 @@
     <meta name="twitter:description" content="A Discord bot and website for voting on movies to watch during streaming sessions.">
     <meta name="twitter:image" content="https://yourdomain.com/path/to/icon.png">
     <meta name="twitter:url" content="https://yourdomain.com">
-    <link rel="alternate" type="application/ld+json" href="/structured-data.json">
+    <link rel="alternate" type="application/ld+json" href="../structured-data.json">
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
-          <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center" href="/">
-              <div class="brand-container d-flex align-items-center">
-                <img src="/logo.svg" alt="" width="30" height="24" class="brand-logo">
-                <span class="brand-text ms-2">FlickPicker</span>
-              </div>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-              data-bs-target="#navbarContent" aria-controls="navbarContent"
-              aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarContent">
-              <div class="ms-auto d-flex align-items-center">
-                <!-- Search Form -->
-                <form class="d-flex me-3" role="search" onsubmit="return false;">
-                  <div class="input-group">
-                      <label for="movieSearch" class="visually-hidden">Search for movies</label>
-                      <input 
-                          class="form-control" 
-                          type="search" 
-                          placeholder="Search movies..." 
-                          aria-label="Search movies"
-                          id="movieSearch"
-                          name="movieSearch"
-                          required 
-                          minlength="2"
-                          autocomplete="off">
-                      <button class="btn btn-outline-success" type="submit" disabled>
-                          <i class="fas fa-search" aria-hidden="true"></i>
-                          <span class="visually-hidden">Search</span>
-                      </button>
-                  </div>
-              </form>
-              <button id="themeToggle" class="btn btn-outline-light me-3" type="button" aria-label="Toggle theme">
-                <i class="fas fa-sun"></i>
-              </button>
-            
-                <!-- Authentication Buttons -->
-                <div id="auth-buttons">
-                  <button class="btn btn-outline-light" type="button" data-bs-toggle="modal"
-                    data-bs-target="#loginModal" id="loginButton">
-                    <i class="fas fa-user" aria-hidden="true"></i>
-                    <span>Login</span>
-                  </button>
-                  <div class="dropdown d-none" id="userMenu">
-                    <button class="btn btn-outline-light dropdown-toggle" type="button"
-                      id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="fas fa-user" aria-hidden="true"></i>
-                      <span class="username">User</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
-                      <li><a class="dropdown-item" href="#" id="profileLink">
-                          <i class="fa fa-user-circle" aria-hidden="true"></i> Profile
-                        </a></li>
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="#" id="settingsLink">
-                          <i class="fas fa-cog" aria-hidden="true"></i> Settings
-                        </a></li>
-                      <li><button class="dropdown-item" type="button" id="logoutLink">
-                          <i class="fa fa-sign-out-alt" aria-hidden="true"></i> Logout
-                        </button></li>
-                    </ul>
-                  </div>
+        <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" role="navigation" aria-label="Main Navigation" data-bs-theme="dark">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="/">
+                    <div class="brand-container d-flex align-items-center">
+                        <img src="/logo.svg" alt="FlickPicker Logo" width="30" height="24" class="brand-logo">
+                        <span class="brand-text ms-2">FlickPicker</span>
+                    </div>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarContent" aria-controls="navbarContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <div class="ms-auto d-flex align-items-center">
+                        <!-- Search Form -->
+                        <form class="d-flex me-3" role="search" aria-labelledby="searchLabel" onsubmit="return false;">
+                            <div class="input-group">
+                                <label for="movieSearch" id="searchLabel" class="visually-hidden">Search for movies</label>
+                                <input
+                                    class="form-control"
+                                    type="search"
+                                    placeholder="Search movies..."
+                                    aria-label="Search movies"
+                                    id="movieSearch"
+                                    name="movieSearch"
+                                    required
+                                    minlength="2"
+                                    autocomplete="off">
+                                <button class="btn btn-outline-success" type="submit" id="searchButton" disabled>
+                                    <i class="fas fa-search" aria-hidden="true"></i>
+                                    <span class="visually-hidden">Search</span>
+                                </button>
+                            </div>
+                        </form>
+                        <button id="themeToggle" class="btn btn-outline-light me-3" type="button" aria-label="Toggle theme">
+                            <i class="fas fa-sun"></i>
+                        </button>
+                        <!-- Authentication Buttons -->
+                        <div id="auth-buttons">
+                            <button class="btn btn-outline-light" type="button" data-bs-toggle="modal"
+                                data-bs-target="#loginModal" id="loginButton">
+                                <i class="fas fa-user" aria-hidden="true"></i>
+                                <span>Login</span>
+                            </button>
+                            <div class="dropdown d-none" id="userMenu">
+                                <button class="btn btn-outline-light dropdown-toggle" type="button"
+                                    id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user" aria-hidden="true"></i>
+                                    <span class="username">User</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                                    <li><a class="dropdown-item" href="#" id="profileLink">
+                                        <i class="fa fa-user-circle" aria-hidden="true"></i> Profile
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" id="settingsLink">
+                                        <i class="fas fa-cog" aria-hidden="true"></i> Settings
+                                    </a></li>
+                                    <li><button class="dropdown-item" type="button" id="logoutLink">
+                                        <i class="fa fa-sign-out-alt" aria-hidden="true"></i> Logout
+                                    </button></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </nav>
-    </header>
+    </header>    
     <main>
         <section id="filter-section">
             <h2>Filter Movies</h2>
