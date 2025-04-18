@@ -32,13 +32,26 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../Frontend/client/public/index.html'));
 });
 
+app.get('/movieList.json', async (req, res) => {
+    try {
+        const filePath = path.join(__dirname, '..', 'Data', 'movieList.json');
+        console.log('📂 Attempting to read:', filePath); // 👈 add this line
+        const json = await fs.readFile(filePath, 'utf8');
+        res.setHeader('Content-Type', 'application/json');
+        res.send(json);
+    } catch (error) {
+        console.error('❌ Error reading movieList.json:', error);
+        res.status(500).json({ error: 'Failed to load movie list' });
+    }
+});
+
 // Endpoint to search for movies
 app.get('/search-movies', async (req, res) => {
     const query = req.query.query?.toLowerCase(); // Safely get the query parameter
 
     try {
         // Read the movie list from the JSON file
-        const movieListPath = path.join(__dirname, 'Data', 'movieList.json');
+        const filePath = path.join(__dirname, '..', 'Data', 'movieList.json');
         let movieList = JSON.parse(await fs.readFile(movieListPath, 'utf8'));
 
         // Ensure movieList is an array before proceeding

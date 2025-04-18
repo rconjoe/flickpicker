@@ -4,9 +4,10 @@ import { showToast, showError } from './utils.mjs';
 import { updateAuthUI, closeModal } from './ui.mjs';
 
 // Default test users
+// Default test users with roles
 const defaultUsers = [
-    { username: 'user1', password: 'pass1' },
-    { username: 'admin', password: 'admin123' }
+    { username: 'user1', password: 'pass1', role: 'user' },
+    { username: 'admin', password: 'admin123', role: 'admin' }
 ];
 
 // Cached DOM elements for performance optimization
@@ -57,7 +58,7 @@ function validateCredentials(username, password) {
     return !!username?.trim() && !!password?.trim();
 }
 
-// Login function
+// Login function// Login function with role assignment and storing user session and role in storage
 export async function login(username, password) {
     const loginBtn = cachedElements.loginBtn;
     if (loginBtn) loginBtn.disabled = true; // Disable button to prevent multiple clicks
@@ -67,13 +68,23 @@ export async function login(username, password) {
         const user = defaultUsers.find(u => u.username === username && u.password === password);
 
         if (user) {
-            state.currentUser = { username: user.username };
+            state.currentUser = { username: user.username, role: user.role };
 
-            // Save user session to sessionStorage
+            // Save user session and role to sessionStorage
             sessionStorage.setItem('user', JSON.stringify(state.currentUser));
+
+            // Save user role to localStorage for longer persistence
+            localStorage.setItem('userRole', user.role);
+
+            // Optionally, store role in cookies (for broader access across tabs and browser restarts)
+            document.cookie = `userRole=${user.role}; path=/; max-age=86400`; // Cookie expires in 1 day
+
+            // Optionally, store role in IndexedDB (for more complex storage needs)
+            // (IndexedDB logic would go here if needed)
 
             updateAuthUI();
             showToast(`Welcome, ${user.username}!`);
+
         } else {
             throw new Error('Invalid credentials');
         }
@@ -131,3 +142,41 @@ export function initializeAuth() {
 document.addEventListener('DOMContentLoaded', () => {
     initializeAuth();
 });
+
+
+// Initialize IndexedDB for role storage
+function storeUserInIndexedDB(user) {
+    const request = indexedDB.open('authDB', 1);
+
+    request.onupgradeneeded = function (e) {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('users')) {
+            db.createObjectStore('users', { keyPath: 'username' });
+        }
+    };
+
+    request.onsuccess = function (e) {
+        const db = e.target.result;
+        const transaction = db.transaction('users', 'readwrite');
+        const store = transaction.objectStore('users');
+        store.put(user); // Save user with role
+    };
+}
+
+export function isAuthorized(requiredRole) {
+    if (!state.currentUser) {
+        return false;
+    }
+    return state.currentUser.role === requiredRole;
+}
+
+export function loadUserFromSession() {
+    const savedUser = sessionStorage.getItem('user');
+    const savedRole = localStorage.getItem('userRole') || getCookie('userRole'); // Fallback to cookie if localStorage is empty
+
+    if (savedUser) {
+        const user = JSON.parse(savedUser);
+        state.currentUser = { username: user.username, role: savedRole || user.role };
+        updateAuthUI();
+    }
+}

@@ -61,7 +61,7 @@
     <meta name="twitter:url" content="https://yourdomain.com">
     <link rel="alternate" type="application/ld+json" href="../structured-data.json">
 </head>
-<body>
+<body class="light | dark">
     <header>
         <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" role="navigation" aria-label="Main Navigation" data-bs-theme="dark">
             <div class="container-fluid">
@@ -110,10 +110,13 @@
                             </button>
                             <div class="dropdown d-none" id="userMenu">
                                 <button class="btn btn-outline-light dropdown-toggle" type="button"
-                                    id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    id="userMenuButton"
+                                    data-bs-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false">
                                     <i class="fas fa-user" aria-hidden="true"></i>
                                     <span class="username">User</span>
-                                </button>
+                                </button>>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
                                     <li><a class="dropdown-item" href="#" id="profileLink">
                                         <i class="fa fa-user-circle" aria-hidden="true"></i> Profile

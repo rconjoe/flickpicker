@@ -4,7 +4,7 @@ import { login, logout, isAuthenticated } from "../public/auth.mjs";
 import { addToPlaylist } from "../public/playlist.mjs";
 import { searchMovies } from "../public/search.mjs";
 import { displayMovies, updateMovieDisplay } from "../public/movies.mjs";
-import { togglePasswordVisibility, updateAuthUI, closeModal } from "../public/ui.mjs";
+import { togglePasswordVisibility, updateAuthUI, closeModal, handleMovieSearch, toggleTheme } from "../public/ui.mjs";
 
 const isBrowser = typeof window !== "undefined";
 const isNode = typeof window === "undefined";
@@ -321,7 +321,13 @@ if (isBrowser && "serviceWorker" in navigator) {
 if (isBrowser)
   document.addEventListener("DOMContentLoaded", function () {
     
+    handleMovieSearch();
+    toggleTheme();
     togglePasswordVisibility();
+    handleMovieSearch();
+    updateAuthUI();
+    initializeAuth();
+    loadUserFromSession();
     
     // Settings modal
     const settingsLink = document.getElementById("settingsLink");

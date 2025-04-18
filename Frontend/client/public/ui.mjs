@@ -23,6 +23,28 @@ export function togglePasswordVisibility() {
     }
 }
 
+export function handleMovieSearch() {
+    const movieSearch = document.getElementById('movieSearch');
+    const searchButton = document.getElementById('searchButton');
+
+    if (movieSearch && searchButton) {
+        movieSearch.addEventListener('input', () => {
+            searchButton.disabled = movieSearch.value.trim().length < 2;
+        });
+    }
+}
+
+// Theme toggle for light/dark mode
+// Theme toggle for light/dark mode
+export function toggleTheme() {
+    const icon = document.querySelector('#themeToggle i');
+    icon.classList.toggle('fa-sun');
+    icon.classList.toggle('fa-moon');
+
+    // Optional: Toggle actual theme classes here
+    document.body.classList.toggle('dark-theme');
+}
+
 // Update the UI based on authentication status
 export function updateAuthUI() {
     const loginButton = document.getElementById('loginButton');
