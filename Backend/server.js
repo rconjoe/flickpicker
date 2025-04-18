@@ -1,7 +1,7 @@
 import express from 'express';
+import cors from 'cors';
 import path from 'path';
 import fs from 'fs/promises'; // For promise-based file operations
-import bodyParser from 'body-parser';
 import { fileURLToPath } from 'url';
 
 const app = express();
@@ -11,15 +11,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middleware to parse JSON bodies
-app.use(bodyParser.json());
+app.use(express.json()); // Replaced bodyParser.json() with express.json()
 
-// Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, '../Frontend/client/public')));
-
-// Route to serve the main HTML file
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../Frontend/client/public/index.html'));
-});
+// Cors middleware to allow cross-origin requests
+app.use(cors());
 
 // Middleware to set correct MIME type for .mjs files
 app.use((req, res, next) => {
@@ -27,6 +22,14 @@ app.use((req, res, next) => {
         res.setHeader('Content-Type', 'application/javascript');
     }
     next();
+});
+
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, '../Frontend/client/public')));
+
+// Route to serve the main HTML file
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/client/public/index.html'));
 });
 
 // Endpoint to search for movies
@@ -37,6 +40,11 @@ app.get('/search-movies', async (req, res) => {
         // Read the movie list from the JSON file
         const movieListPath = path.join(__dirname, 'Data', 'movieList.json');
         let movieList = JSON.parse(await fs.readFile(movieListPath, 'utf8'));
+
+        // Ensure movieList is an array before proceeding
+        if (!Array.isArray(movieList)) {
+            return res.status(500).json({ error: 'Invalid movie data' });
+        }
 
         // Filter the movie list based on the query
         const filteredMovies = movieList.filter(movie => {

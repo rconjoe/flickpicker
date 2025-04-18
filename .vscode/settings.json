@@ -2760,7 +2760,11 @@
 	// Enables experimental terminal Intellisense suggestions for supported shells (PowerShell) when `terminal.integrated.shellIntegration.enabled` is set to `true`.
 	"terminal.integrated.suggest.enabled": false,
 	// Controls whether suggestions should automatically show up while typing.
-	"terminal.integrated.suggest.quickSuggestions": true,
+	"terminal.integrated.suggest.quickSuggestions": {
+		"other": true,
+		"comments": false,
+		"strings": true
+	},
 	// Controls whether suggestions should run immediately when `Enter` (not `Tab`) is used to accept the result.
 	//  - never: Never run on `Enter`.
 	//  - exactMatch: Run on `Enter` when the suggestion is typed in its entirety.
@@ -3719,6 +3723,6 @@
 	// Simple Browser
 	// Enable/disable the floating indicator that shows when focused in the simple browser.
 	"simpleBrowser.focusLockIndicator.enabled": true,
-	"liveServer.settings.port": 5503,
+	"liveServer.settings.port": 5500,
 	"testing.automaticallyOpenTestResults": "openOnTestStart"
 }
