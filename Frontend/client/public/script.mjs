@@ -4,6 +4,7 @@ import { login, logout, isAuthenticated } from "../public/auth.mjs";
 import { addToPlaylist } from "../public/playlist.mjs";
 import { searchMovies } from "../public/search.mjs";
 import { displayMovies, updateMovieDisplay } from "../public/movies.mjs";
+import { togglePasswordVisibility, updateAuthUI, closeModal } from "../public/ui.mjs";
 
 const isBrowser = typeof window !== "undefined";
 const isNode = typeof window === "undefined";
@@ -319,6 +320,9 @@ if (isBrowser && "serviceWorker" in navigator) {
 
 if (isBrowser)
   document.addEventListener("DOMContentLoaded", function () {
+    
+    togglePasswordVisibility();
+    
     // Settings modal
     const settingsLink = document.getElementById("settingsLink");
     if (settingsLink) {
@@ -440,22 +444,5 @@ if (isBrowser) {
       window.bootstrap.Modal.getInstance(
         document.getElementById("settingsModal")
       );
-      document
-        .getElementById("togglePassword")
-        .addEventListener("click", function () {
-          const passwordField = document.getElementById("password");
-          const eyeIcon = document.getElementById("eyeIcon");
-          if (passwordField && eyeIcon) {
-            const type =
-              passwordField.type === "password" ? "text" : "password";
-            passwordField.type = type;
-            eyeIcon.classList.toggle("fa-eye-slash");
-            eyeIcon.classList.toggle("fa-eye");
-          } else {
-            console.error("Password field or eye icon not found.");
-          }
-        });
-      eyeIcon.classList.toggle("fa-eye-slash");
-      eyeIcon.classList.toggle("fa-eye");
     });
 }
