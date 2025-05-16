@@ -163,7 +163,6 @@ async function loadFromCacheStorage() {
 // Load movies from JSON file served from localhost
 async function loadFromJson() {
     try {
-        console.log('Fetching from API endpoint...');
         const response = await fetch('http://localhost:3000/movieList.json');
         console.log('API Response status:', response.status);
         
@@ -173,9 +172,7 @@ async function loadFromJson() {
         
         const data = await response.json();
         
-        if (!data || !Array.isArray(data)) {
-            throw new Error('Invalid data format received from API');
-        }
+        if (!data) throw new Error('No data received from API');
         
         return data;
     } catch (error) {
