@@ -1,6 +1,6 @@
 import { state } from "../public/state.mjs";
 import { showToast } from "../public/utils.mjs";
-import { login, logout, isAuthenticated } from "../public/auth.mjs";
+import { login, logout, isAuthenticated, initializeAuth, loadUserFromSession } from "../public/auth.mjs";
 import { addToPlaylist } from "../public/playlist.mjs";
 import { searchMovies } from "../public/search.mjs";
 import { displayMovies, updateMovieDisplay } from "../public/movies.mjs";
@@ -324,7 +324,6 @@ if (isBrowser)
     handleMovieSearch();
     toggleTheme();
     togglePasswordVisibility();
-    handleMovieSearch();
     updateAuthUI();
     initializeAuth();
     loadUserFromSession();

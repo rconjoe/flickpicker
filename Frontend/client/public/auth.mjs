@@ -21,6 +21,11 @@ function cacheDOM() {
     cachedElements.logoutLink = document.getElementById('logoutLink');
 }
 
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
+
 // Attach event listeners to the DOM elements
 function attachEventListeners() {
     // Login Button
@@ -102,15 +107,6 @@ export function logout() {
 
     updateAuthUI(); // Update UI after logout
     showToast('You have logged out successfully');
-}
-
-// Load user session from storage
-export function loadUserFromSession() {
-    const savedUser = sessionStorage.getItem('user');
-    if (savedUser) {
-        state.currentUser = JSON.parse(savedUser);
-        updateAuthUI();
-    }
 }
 
 // Handle login/logout logic
