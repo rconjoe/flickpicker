@@ -13,53 +13,62 @@ const cachedElements = {
 export async function loadMovies() {
     try {
         let movies = [];
+        console.log('Starting movie loading process...');
 
-        // Attempt loading from local storage
-        const localMovies = loadFromLocalStorage();
-        if (localMovies) {
-            movies = localMovies;
-        }
-
-        // Attempt loading from session storage if not found in local storage
-        if (!movies.length) {
-            const sessionMovies = loadFromSessionStorage();
-            if (sessionMovies) {
-                movies = sessionMovies;
-            }
-        }
-
-        // Attempt loading from IndexedDB
-        if (!movies.length) {
-            const indexedMovies = await loadFromIndexedDB();
-            if (indexedMovies) {
-                movies = indexedMovies;
-            }
-        }
-
-        // Attempt loading from cookies
-        if (!movies.length) {
-            const cookieMovies = loadFromCookies();
-            if (cookieMovies) {
-                movies = cookieMovies;
-            }
-        }
-
-        // Attempt loading from Cache Storage
-        if (!movies.length) {
-            const cacheMovies = await loadFromCacheStorage();
-            if (cacheMovies) {
-                movies = cacheMovies;
-            }
-        }
-
-        // Fallback: Load from JSON file served from localhost
-        if (!movies.length) {
+        // Load from the API first
+        try {
+            console.log('Attempting to load from API...');
             movies = await loadFromJson();
+            if (movies && movies.length > 0) {
+                console.log(`Successfully loaded ${movies.length} movies from API`);
+                // Store in localStorage for future use
+                localStorage.setItem('movieList', JSON.stringify(movies));
+                renderMovies(movies);
+                return;
+            }
+        } catch (error) {
+            console.warn('API load failed:', error);
+        }
+
+         // Attempt loading from local storage
+        if (!movies.length) {
+            console.log('Attempting to load from localStorage...');
+            const localMovies = loadFromLocalStorage();
+            if (localMovies && localMovies.length > 0) {
+                console.log(`Found ${localMovies.length} movies in localStorage`);
+                movies = localMovies;
+                renderMovies(movies);
+                return;
+            }
+        }
+
+        // Attempt loading from other storage methods
+        if (!movies.length) {
+            const sources = [
+                { name: 'sessionStorage', loader: loadFromSessionStorage },
+                { name: 'IndexedDB', loader: loadFromIndexedDB },
+                { name: 'cookies', loader: loadFromCookies },
+                { name: 'cacheStorage', loader: loadFromCacheStorage }
+            ];
+
+            for (const source of sources) {
+                console.log(`Attempting to load from ${source.name}...`);
+                try {
+                    const loadedMovies = await source.loader();
+                    if (loadedMovies && loadedMovies.length > 0) {
+                        console.log(`Successfully loaded ${loadedMovies.length} movies from ${source.name}`);
+                        movies = loadedMovies;
+                        break;
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load from ${source.name}:`, error);
+                }
+            }
         }
 
         // Deduplicate movies
         movies = deduplicateMovies(movies);
-
+        
         // Render the movies to the HTML div
         renderMovies(movies);
     } catch (error) {
@@ -154,14 +163,24 @@ async function loadFromCacheStorage() {
 // Load movies from JSON file served from localhost
 async function loadFromJson() {
     try {
+        console.log('Fetching from API endpoint...');
         const response = await fetch('http://localhost:3000/movieList.json');
+        console.log('API Response status:', response.status);
+        
         if (!response.ok) {
             throw new Error(`Failed to fetch JSON: ${response.statusText}`);
         }
-        return response.json();
+        
+        const data = await response.json();
+        
+        if (!data || !Array.isArray(data)) {
+            throw new Error('Invalid data format received from API');
+        }
+        
+        return data;
     } catch (error) {
         console.error('Error loading JSON file:', error);
-        return [];
+        throw error
     }
 }
 
