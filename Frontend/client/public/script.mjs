@@ -383,9 +383,9 @@ if (isBrowser)
       logoutLink.addEventListener("click", logout);
     }
 
-    const movieGrid = document.getElementById("movie-table");
-    if (movieGrid) {
-      movieGrid.addEventListener("click", handleMovieInteraction);
+    const movieTable = document.getElementById("movie-table");
+    if (movieTable) {
+      movieTable.addEventListener("click", handleMovieInteraction);
     }
   });
 const filterSelects = document.querySelectorAll("#filter-section select");
@@ -412,9 +412,9 @@ if (isBrowser) {
     logoutLink.addEventListener("click", logout);
   }
 
-  const movieGrid = document.getElementById("movie-table");
-  if (movieGrid) {
-    movieGrid.addEventListener("click", handleMovieInteraction);
+  const movieTable = document.getElementById("movie-table");
+  if (movieTable) {
+    movieTable.addEventListener("click", handleMovieInteraction);
   }
 
   // Movie interaction listeners
