@@ -45,6 +45,18 @@ const movieController = {
             console.error("Error saving movie:", error);
             res.status(500).json({ success: false, error: "Failed to save movie" });
         }
+    },
+
+    getMovies: async (req, res) => {
+        try {
+            const movieListPath = path.join(__dirname, '..', 'Data', 'movieList.json');
+            //const movieList = JSON.parse(await fs.readFile(movieListPath, 'utf8'));
+            //res.status(200).json(movieList);
+            res.sendFile(movieListPath, { headers: { 'Content-Type': 'application/json' } });
+        } catch (error) {
+            console.error('Error fetching movies:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     }
 };
 
