@@ -385,7 +385,7 @@ if (isBrowser)
     if (movieGrid) {
       movieGrid.addEventListener("click", handleMovieInteraction);
     }
-  });
+  }, {once: true});
 const filterSelects = document.querySelectorAll("#filter-section select");
 if (filterSelects) {
   filterSelects.forEach((select) => {

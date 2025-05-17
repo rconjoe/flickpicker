@@ -6,7 +6,7 @@ const isBrowser = typeof window !== 'undefined';
 
 // Helper function to create movie card HTML
 function createMovieCardHTML(movie) {
-    const fallbackImage = '/path/to/default.jpg';
+    const fallbackImage = ''; // '/path/to/default.jpg';
     return `
         <div class="col">
             <div class="card h-100" data-movie-id="${movie.id}">
