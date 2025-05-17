@@ -1,5 +1,5 @@
-import { state } from '../public/state.mjs';
-import { showError } from '../public/utils.mjs';
+import { state } from './state.mjs';
+import { showError } from './utils.mjs';
 
 // Check if running in a browser environment
 const isBrowser = typeof window !== 'undefined';
@@ -94,9 +94,10 @@ async function fetchMovies(source = '../Data/movieList.json') {
 }
 
 // Explicit function to display movies (wrapper around updateMovieDisplay)
-function displayMovies() {
+function displayMovies(movieList) {
     if (!isBrowser) return;
-    updateMovieDisplay();
+    state.filteredMovies = movieList;
+    updateMovieDisplay(movieList);
 }
 
 // Export module functions, including displayMovies
