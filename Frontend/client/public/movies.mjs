@@ -57,7 +57,7 @@ function createMovieCardHTML(movie) {
 function updateMovieDisplay() {
     if (!isBrowser) return;
 
-    const movieGrid = document.getElementById('movie-grid');
+    const movieGrid = document.getElementById('movie-table');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
 
     // Hide loading placeholder

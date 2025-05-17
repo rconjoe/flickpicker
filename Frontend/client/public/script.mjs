@@ -383,7 +383,7 @@ if (isBrowser)
       logoutLink.addEventListener("click", logout);
     }
 
-    const movieGrid = document.getElementById("movie-grid");
+    const movieGrid = document.getElementById("movie-table");
     if (movieGrid) {
       movieGrid.addEventListener("click", handleMovieInteraction);
     }
@@ -412,14 +412,14 @@ if (isBrowser) {
     logoutLink.addEventListener("click", logout);
   }
 
-  const movieGrid = document.getElementById("movie-grid");
+  const movieGrid = document.getElementById("movie-table");
   if (movieGrid) {
     movieGrid.addEventListener("click", handleMovieInteraction);
   }
 
   // Movie interaction listeners
   document
-    .getElementById("movie-grid")
+    .getElementById("movie-table")
     .addEventListener("click", handleMovieInteraction);
 }
 

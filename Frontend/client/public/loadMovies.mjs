@@ -6,7 +6,7 @@ const JSON_FILE_PATH = "../Data/movieList.json";
 
 // Cache DOM elements
 const cachedElements = {
-    movieGrid: document.getElementById('movie-grid'),
+    movieGrid: document.getElementById('movie-table'),
 };
 
 // Load movies from different sources
