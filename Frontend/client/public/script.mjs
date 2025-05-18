@@ -353,35 +353,6 @@ if (filterSelects) {
 }
 
 if (isBrowser) {
-  // Filter listeners
-  document.querySelectorAll("#filter-section select").forEach((select) => {
-    select.addEventListener("change", applyFilters);
-  });
-  const loginBtn = document.getElementById("loginBtn");
-  if (loginBtn) {
-    loginBtn.addEventListener("click", () => {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      login(username, password);
-    });
-  }
-  const logoutLink = document.getElementById("logoutLink");
-  if (logoutLink) {
-    logoutLink.addEventListener("click", logout);
-  }
-
-  const movieTable = document.getElementById("movie-table");
-  if (movieTable) {
-    movieTable.addEventListener("click", handleMovieInteraction);
-  }
-
-  // Movie interaction listeners
-  document
-    .getElementById("movie-table")
-    .addEventListener("click", handleMovieInteraction);
-}
-
-if (isBrowser) {
   document
     .getElementById("saveSettingsBtn")
     .addEventListener("click", function () {
