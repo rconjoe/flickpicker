@@ -3,10 +3,12 @@
     "version": "0.0.1",
     "main": "server.js",
     "type": "module",
-    "scripts": {
+    "scripts":
+    {
         "start": "nodemon index.js"
     },
-    "dependencies": {
+    "dependencies":
+    {
         "bcrypt": "~5.1.1",
         "body-parser": "~1.20.3",
         "cookie-parser": "~1.4.7",
@@ -20,7 +22,8 @@
         "passport": "~0.7.0",
         "yup": "~1.4.0"
     },
-    "devDependencies": {
+    "devDependencies":
+    {
         "chai": "~5.1.1",
         "mocha": "~10.7.3",
         "morgan": "~1.10.0",
