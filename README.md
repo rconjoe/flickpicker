@@ -12,12 +12,18 @@ The UI library/framework is Bootstrap with FontAwesome via CDN on the index.html
 ## Development
 
 Best way to work on this at the moment is to install a live hot reload extension like in VSCode Five Server or Live Server and
-open the index.html in Frontend/client/public.  It might work partially in nodejs/express, but there isn't any
+open the index.html in Frontend/client/public. It might work partially in nodejs/express, but there isn't any
 app.js // App.js or index.js yet on either side.
+
+To serve everything in development without VSCode:
+
+1. Start the backend server: `cd Backend/ && npm run start`
+2. Host the root directory on a port other than 3000 using `python -m http.server 8080` or [live-server](https://www.npmjs.com/package/live-server) (if you want hot-reload).
+3. Navigate to `localhost:8080/Frontend/client/public` in a browser
 
 ## TODO
 
-This project has plenty left to be done.  If you would like to contribute to this project, you're welcome to contribute this
+This project has plenty left to be done. If you would like to contribute to this project, you're welcome to contribute this
 
 See: [View the TODO list](TODO.md)
 
@@ -25,7 +31,7 @@ If you don't see a feature you would like, open a Feature Request and submit one
 
 ## Contributing
 
-If you still see the Issue in the Issue tab it is still open.  
+If you still see the Issue in the Issue tab it is still open.
 
 If there is a bug and or something doesn't work as expected please let us know by submitting a [Bug] in the Issues tab.
 
