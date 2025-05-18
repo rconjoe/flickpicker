@@ -1,5 +1,6 @@
 // Import dependencies if necessary
 import { showError } from './utils.mjs'; // Optional: Error handling utility
+import { state } from './state.mjs';
 
 // Path to the movieList.json file
 const JSON_FILE_PATH = "../Data/movieList.json";
@@ -189,7 +190,10 @@ function renderMovies(movies) {
         return;
     }
 
-    cachedElements.movieTable.innerHTML = ''; // Clear existing content
+    state.movies = movies;
+    console.log(`renderMovies, state.filteredMovies: ${state.filteredMovies.length}, state.movies: ${state.movies.length}`);
+
+    cachedElements.movieGrid.innerHTML = ''; // Clear existing content
 
     if (!movies.length) {
         cachedElements.movieTable.innerHTML = '<p>No movies available.</p>';
