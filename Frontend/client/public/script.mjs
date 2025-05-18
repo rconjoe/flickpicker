@@ -338,9 +338,9 @@ if (isBrowser)
       logoutLink.addEventListener("click", logout);
     }
 
-    const movieGrid = document.getElementById("movie-grid");
-    if (movieGrid) {
-      movieGrid.addEventListener("click", handleMovieInteraction);
+    const movieTable = document.getElementById("movie-table");
+    if (movieTable) {
+      movieTable.addEventListener("click", handleMovieInteraction);
     }
   }, {once: true});
 const filterSelects = document.querySelectorAll("#filter-section select");

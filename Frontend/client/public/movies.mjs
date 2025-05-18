@@ -64,18 +64,15 @@ function createMovieCardHTML(movie) {
 function updateMovieDisplay(filteredMovies) {
     if (!isBrowser) return;
 
-    // Determine which list to render: use passed-in filteredMovies or fallback to state
-    const moviesToDisplay = Array.isArray(filteredMovies) ? filteredMovies : state.filteredMovies;
-
-    const movieGrid = document.getElementById('movie-grid');
+    const movieTable = document.getElementById('movie-table');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
 
     // Hide loading placeholder
     if (loadingPlaceholder) loadingPlaceholder.style.display = 'none';
 
     // Show fallback message if no movies are found
-    if (!moviesToDisplay || moviesToDisplay.length === 0) {
-        movieGrid.innerHTML = `
+    if (!state.filteredMovies || state.filteredMovies.length === 0) {
+        movieTable.innerHTML = `
             <div class="col-12 text-center">
                 <p>No movies found matching your criteria.</p>
             </div>
@@ -84,7 +81,7 @@ function updateMovieDisplay(filteredMovies) {
     }
 
     // Render movie cards dynamically
-    movieGrid.innerHTML = moviesToDisplay.map(createMovieCardHTML).join('');
+    movieTable.innerHTML = state.filteredMovies.map(createMovieCardHTML).join('');
 }
 
 // Unified fetch function with fallback
