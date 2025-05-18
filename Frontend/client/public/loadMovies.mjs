@@ -6,7 +6,7 @@ const JSON_FILE_PATH = "../Data/movieList.json";
 
 // Cache DOM elements
 const cachedElements = {
-    movieGrid: document.getElementById('movie-grid'),
+    movieTable: document.getElementById('movie-table'),
 };
 
 // Load movies from different sources
@@ -163,7 +163,8 @@ async function loadFromCacheStorage() {
 // Load movies from JSON file served from localhost
 async function loadFromJson() {
     try {
-        const response = await fetch('http://localhost:3000/movieList.json');
+        console.log('Loading movies from JSON file...');
+        const response = await fetch('http://localhost:3000/movies');
         console.log('API Response status:', response.status);
         
         if (!response.ok) {
@@ -183,15 +184,15 @@ async function loadFromJson() {
 
 // Render movies to the HTML div
 function renderMovies(movies) {
-    if (!cachedElements.movieGrid) {
+    if (!cachedElements.movieTable) {
         console.error('Failed to find movie grid element.');
         return;
     }
 
-    cachedElements.movieGrid.innerHTML = ''; // Clear existing content
+    cachedElements.movieTable.innerHTML = ''; // Clear existing content
 
     if (!movies.length) {
-        cachedElements.movieGrid.innerHTML = '<p>No movies available.</p>';
+        cachedElements.movieTable.innerHTML = '<p>No movies available.</p>';
         return;
     }
 
@@ -210,6 +211,6 @@ function renderMovies(movies) {
                 </div>
             </div>
         `;
-        cachedElements.movieGrid.insertAdjacentHTML('beforeend', movieCard);
+        cachedElements.movieTable.insertAdjacentHTML('beforeend', movieCard);
     });
 }
