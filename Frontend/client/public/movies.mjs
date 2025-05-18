@@ -1,5 +1,5 @@
-import { state } from '../public/state.mjs';
-import { showError } from '../public/utils.mjs';
+import { state } from './state.mjs';
+import { showError } from './utils.mjs';
 
 // Check if running in a browser environment
 const isBrowser = typeof window !== 'undefined';
@@ -13,7 +13,7 @@ if (isBrowser) {
 
 // Helper function to create movie card HTML
 function createMovieCardHTML(movie) {
-    const fallbackImage = '/path/to/default.jpg';
+    const fallbackImage = ''; // '/path/to/default.jpg';
     return `
         <div class="col">
             <div class="card h-100" data-movie-id="${movie.id}">
@@ -105,13 +105,10 @@ async function fetchMovies(source = '/Data/movieList.json') {
 }
 
 // Explicit function to display movies (wrapper around updateMovieDisplay)
-function displayMovies(filteredMovies) {
+function displayMovies(movieList) {
     if (!isBrowser) return;
-
-    const moviesList = typeof filteredMovies === 'undefined' ?
-    state.movies : filteredMovies;
-
-    updateMovieDisplay(moviesList);
+    state.filteredMovies = movieList;
+    updateMovieDisplay(movieList);
 }
 
 

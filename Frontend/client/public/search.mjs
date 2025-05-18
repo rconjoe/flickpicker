@@ -47,6 +47,6 @@ export function searchMovies() {
         }, 300); // Set debounce delay (300ms)
 
         searchInput.addEventListener('input', debouncedSearch);
-    });
+    }, {once: true});
 }
 searchMovies();
