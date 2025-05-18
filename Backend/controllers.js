@@ -61,6 +61,45 @@ const movieController = {
             console.error('Error fetching movies:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
+    },
+
+    // Add this function to your controller
+    updateVote: async (req, res) => {
+        try {
+            const { movieId, voteType, userId } = req.body;
+            
+            // Get the current movies
+            // This is a simplified approach - in a real app you would use a database
+            const movieListPath = path.join(__dirname, '..', 'Data', 'movieList.json');
+            const movies = JSON.parse(await fs.readFile(movieListPath, 'utf8'));
+            
+            // Find the movie
+            const movieIndex = movies.findIndex(m => m.id == movieId);
+            if (movieIndex === -1) {
+                return res.status(404).json({ error: 'Movie not found' });
+            }
+            
+            // Update the vote count
+            if (voteType === 'up') {
+                movies[movieIndex].voteCount = (movies[movieIndex].voteCount || 0) + 1;
+            }else if (voteType === 'down') {
+                movies[movieIndex].voteCount = (movies[movieIndex].voteCount || 0) - 1;
+            }
+            
+            // Save updated movies
+            await fs.writeFile(movieListPath, JSON.stringify(movies, null, 2));
+            
+            // Return the new vote count
+            res.json({
+                success: true,
+                movieId,
+                newVoteCount: movies[movieIndex].voteCount
+            });
+            
+        } catch (error) {
+            console.error('Error updating vote:', error);
+            res.status(500).json({ error: 'Failed to update vote' });
+        }
     }
 };
 
