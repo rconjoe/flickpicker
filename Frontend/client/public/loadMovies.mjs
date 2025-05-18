@@ -7,7 +7,7 @@ const JSON_FILE_PATH = "../Data/movieList.json";
 
 // Cache DOM elements
 const cachedElements = {
-    movieGrid: document.getElementById('movie-grid'),
+    movieTable: document.getElementById('movie-table'),
 };
 
 // Load movies from different sources
@@ -185,7 +185,7 @@ async function loadFromJson() {
 
 // Render movies to the HTML div
 function renderMovies(movies) {
-    if (!cachedElements.movieGrid) {
+    if (!cachedElements.movieTable) {
         console.error('Failed to find movie grid element.');
         return;
     }
@@ -196,7 +196,7 @@ function renderMovies(movies) {
     cachedElements.movieGrid.innerHTML = ''; // Clear existing content
 
     if (!movies.length) {
-        cachedElements.movieGrid.innerHTML = '<p>No movies available.</p>';
+        cachedElements.movieTable.innerHTML = '<p>No movies available.</p>';
         return;
     }
 
@@ -215,6 +215,6 @@ function renderMovies(movies) {
                 </div>
             </div>
         `;
-        cachedElements.movieGrid.insertAdjacentHTML('beforeend', movieCard);
+        cachedElements.movieTable.insertAdjacentHTML('beforeend', movieCard);
     });
 }
