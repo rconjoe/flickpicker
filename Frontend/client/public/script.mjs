@@ -180,21 +180,6 @@ export function handleMovieInteraction(event) {
   }
 }
 
-export function handleVote(movieId, voteType) {
-  if (
-    !state.currentUser ||
-    !state.currentUser.id ||
-    !state.currentUser.username
-  ) {
-    showToast("Please log in to vote", "warning");
-    return;
-  }
-
-  // Implement voting logic here
-  console.log(`Vote ${voteType} for movie ${movieId}`);
-  // Update UI or make API call to record vote
-}
-
 export async function updateMovieListJson(movies) {
   try {
     const response = await fetch("http://localhost:3000/update-movie-list", {
