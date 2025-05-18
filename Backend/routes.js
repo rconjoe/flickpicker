@@ -8,5 +8,6 @@ const router = express.Router();
 router.get('/search-movies', movieController.searchMovies);
 router.post('/save-movie', movieController.saveMovie);
 router.get('/movies', movieController.getMovies);
+router.post('/update-vote', movieController.updateVote);
 
 export default router;
