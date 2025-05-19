@@ -661,13 +661,7 @@
     <script type="module" src="state.mjs"></script>
     <script type="module" src="utils.mjs"></script>
     <script type="module">
-        import { loadMovies } from './loadMovies.mjs';
-    
-        document.addEventListener('DOMContentLoaded', () => {
-            loadMovies();
-        });
-
-        import { saveMovie } from './script.mjs';
+        import { saveMovie } from './movies.mjs';
         document.addEventListener("DOMContentLoaded", () => {
             const form = document.getElementById("add-movie-form");
             if (form) {

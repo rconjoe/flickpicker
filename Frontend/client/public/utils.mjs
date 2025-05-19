@@ -41,3 +41,14 @@ export function showError(message, duration = 3000) {
         errorDiv.remove();
     }, duration);
 }
+
+// Function to check if a string is a valid URL
+export function isValidUrl(string) {
+    if (!string) return true; // Allow empty strings
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}

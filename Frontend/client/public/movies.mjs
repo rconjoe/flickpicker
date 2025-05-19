@@ -1,15 +1,75 @@
 import { state } from './state.mjs';
-import { showError } from './utils.mjs';
+import { showError, showToast } from './utils.mjs';
+import { addToPlaylist } from './playlist.mjs';
 
-// Check if running in a browser environment
-const isBrowser = typeof window !== 'undefined';
+// Cache DOM elements
+const cachedElements = {
+    movieTable: document.getElementById('movie-table'),
+};
 
-if (isBrowser) {
-    document.addEventListener('DOMContentLoaded', () => {
-        // Load the full movie list on initial page load
-        fetchMovies();
+document.addEventListener('DOMContentLoaded', () => {
+    // Load the full movie list on initial page load
+    loadMovies();
+
+    // Event listener for adding movie form submission
+    const form = document.getElementById("add-movie-form");
+    if (form) {
+        form.addEventListener("submit", saveMovie);
+    } else {
+        console.error("Form with id 'add-movie-form' not found.");
+    }
+    
+    // Add movie button visibility
+    const addMovieButton = document.getElementById("addMovieButton");
+    if (addMovieButton) {
+        try {
+            addMovieButton.style.display = isAuthenticated() ? "block" : "none";
+        } catch (error) {
+            console.error("Error checking authentication:", error);
+            addMovieButton.style.display = "none"; // Default to hiding the button
+        }
+    }
+
+    // Initialize event listeners for filters and movie interactions
+    document.querySelectorAll("#filter-section select").forEach((select) => {
+        select.addEventListener("change", applyFilters);
     });
+    
+    if (cachedElements.movieTable) {
+        cachedElements.movieTable.addEventListener("click", handleMovieInteraction);
+    }
+}, { once: true });
+
+function handleMovieInteraction(event) {
+    const target = event.target;
+    const movieCard = target.closest(".card");
+
+    if (!movieCard) return;
+
+    const movieId = movieCard.dataset.movieId;
+
+    if (target.classList.contains("vote-btn")) {
+        handleVote(movieId, target.dataset.vote);
+    } else if (target.classList.contains("add-to-playlist-btn")) {
+        addToPlaylist(movieId);
+    }
 }
+  
+function handleVote(movieId, voteType) {
+    if (
+      !state.currentUser ||
+      !state.currentUser.id ||
+      !state.currentUser.username
+    ) {
+      showToast("Please log in to vote", "warning");
+      return;
+    }
+  
+    // Implement voting logic here
+    console.log(`Vote ${voteType} for movie ${movieId}`);
+    // Update UI or make API call to record vote
+}
+  
 
 // Helper function to create movie card HTML
 function createMovieCardHTML(movie) {
@@ -60,10 +120,8 @@ function createMovieCardHTML(movie) {
     `;
 }
 
-// Update movie display dynamically
-function updateMovieDisplay(filteredMovies) {
-    if (!isBrowser) return;
-
+// Rerenders filtered movies
+function updateMovieDisplay() {
     const movieTable = document.getElementById('movie-table');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
 
@@ -84,30 +142,171 @@ function updateMovieDisplay(filteredMovies) {
     movieTable.innerHTML = state.filteredMovies.map(createMovieCardHTML).join('');
 }
 
-// Unified fetch function with fallback
-async function fetchMovies(source = '/Data/movieList.json') {
-    try {
-        const response = await fetch(source);
-        if (!response.ok) throw new Error('Failed to fetch movies');
-
-        console.log('📂 Fetching movies from:', source); // Debugging line
-        const movies = await response.json();
-        state.movies = movies;
-        state.filteredMovies = [...movies]; // Default filtered list
-        updateMovieDisplay(); // Update UI after fetching
-    } catch (error) {
-        console.error('Error fetching movies:', error);
-        showError('Failed to fetch movies. Please try again later.');
-    }
-}
-
 // Explicit function to display movies (wrapper around updateMovieDisplay)
 function displayMovies(movieList) {
-    if (!isBrowser) return;
     state.filteredMovies = movieList;
     updateMovieDisplay(movieList);
 }
 
+async function loadMovies() {
+    let movies = [];
+
+    try {
+        movies = await fetchMovies();
+        if (movies && movies.length > 0) {
+            localStorage.setItem("moviesList", JSON.stringify(movies));
+            state.movies = movies;
+            state.filteredMovies = movies; // Default filtered list
+            updateMovieDisplay(); // Update UI after fetching
+            return;
+        }
+    } catch (error) {
+        console.error('Error fetching movies:', error);
+        showToast('Failed to fetch movies. Please try again later.', 'error');
+    }
+
+    try {
+        movies = getMoviesFromLocalStorage();
+        if (movies && movies.length > 0) {
+            state.movies = movies;
+            state.filteredMovies = movies; // Default filtered list
+            updateMovieDisplay(); // Update UI after fetching
+        }
+    } catch (error) {
+        console.error('Error fetching movies from local storage:', error);
+        showToast('Failed to fetch movies from local storage. Please try again later.', 'error');
+    }
+}
+
+// Unified fetch function with fallback
+async function fetchMovies() {
+    try {
+        const response = await fetch("/movies");
+        if (!response.ok) throw new Error('Failed to fetch movies');
+
+        console.log("📂 Fetching movies from: /movies"); // Debugging line
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching movies:', error);
+        showToast('Failed to fetch movies. Please try again later.', 'error');
+    }
+
+}
+
+// Function to fetch movies from local storage
+function getMoviesFromLocalStorage() {
+    const storedMoviesStr = localStorage.getItem("moviesList");
+    if (storedMoviesStr) {
+        return JSON.parse(storedMoviesStr)
+    }
+}
+
+// Filtering and Sorting
+function applyFilters() {
+    const genre = document.getElementById("genre-filter").value.toLowerCase();
+    const year = document.getElementById("year-filter").value;
+    const rating = document.getElementById("rating-filter").value;
+    const sortOrder = document.getElementById("sort-order").value;
+
+    state.filteredMovies = state.movies.filter((movie) => {
+    const genreMatch =
+        !genre ||
+        (movie.category && movie.category.toLowerCase().includes(genre));
+    const yearMatch = !year || movie.year.toString() === year;
+    const ratingMatch = !rating || movie.rating === rating;
+    return genreMatch && yearMatch && ratingMatch;
+    });
+
+    sortMovies(sortOrder);
+    updateMovieDisplay();
+}
+  
+function sortMovies(criteria) {
+    state.filteredMovies.sort((a, b) => {
+        switch (criteria) {
+            case "title":
+                return a.title.localeCompare(b.title);
+            case "year":
+                return b.year - a.year;
+            case "runtime":
+                return (parseFloat(a.runtime) || 0) - (parseFloat(b.runtime) || 0);
+            default:
+                return 0;
+        }
+    });
+}
+
+
+async function saveMovie(event) {
+  event.preventDefault(); // Prevent form submission
+  console.log("saveMovie function triggered");
+  const form = document.getElementById("add-movie-form");
+  const formData = new FormData(form);
+
+  const movieData = {
+    id: Date.now(), // Generate unique ID
+    title: formData.get("title"),
+    dateWatched: formData.get("dateWatched"),
+    watched: false,
+    year: formData.get("year"),
+    category: formData.get("category"),
+    trailerLink: formData.get("trailerLink"),
+    movieLink: formData.get("movieLink"),
+    modernTrailerLink: formData.get("modernTrailerLink"),
+    requestedBy: {
+      userId: "anonymous",
+      username: formData.get("requestedBy"),
+      platform: "Web",
+    },
+    language: formData.get("language"),
+    subtitles: formData.get("subtitles") === "true",
+    voteCount: 0,
+    imageUrl: "",
+    runtime: "",
+    ratings: "",
+    trailerPrivate: false,
+    moviePrivate: false,
+  };
+  console.log("Movie data to be saved:", movieData);
+
+  try {
+    const response = await fetch("http://localhost:3000/save-movie", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(movieData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to save movie");
+    }
+
+    alert("Movie saved successfully!");
+    form.reset(); // Reset the form
+  } catch (error) {
+    console.error("Error saving movie:", error);
+    alert("Failed to save movie. Please try again.");
+  }
+}
+
+function validateMovieData(data) {
+  return (
+    data.title && // Title is required
+    data.year && // Year is required
+    data.category && // Category is required
+    data.requestedBy.username && // Requested By username is required
+    data.language && // Language is required
+    data.trailerLink && // Trailer Link is required
+    data.movieLink && // Movie Link is required
+    data.modernTrailerLink && // Modern Trailer Link is required
+    data.dateWatched && // Date Watched is required
+    data.imdbLink && // IMDB Link is required
+    data.tmdbLink && // TMDB Link is required
+    !isNaN(data.year) && // Year should be a number
+    typeof data.subtitles === "boolean" // Subtitles should be boolean
+  );
+}
 
 // Export module functions, including displayMovies
-export { createMovieCardHTML, updateMovieDisplay, fetchMovies, displayMovies };
+export { createMovieCardHTML, updateMovieDisplay, displayMovies, saveMovie };
