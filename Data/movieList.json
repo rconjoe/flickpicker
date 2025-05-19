@@ -7,12 +7,13 @@
         "trailerLink": "https://youtu.be/E65wgbFGGeM",
         "movieLink": "",
         "modernTrailerLink": "",
-        "requestedBy": {
+        "requestedBy":
+        {
             "userId": "987654320",
             "username": "gamer460",
             "platform": "Discord"
         },
-        "category": "",
+        "category": "action",
         "trailerPrivate": false,
         "moviePrivate": false,
         "year": 1991,
@@ -21,7 +22,7 @@
         "voteCount": 0,
         "imageUrl": "./img/movie1.jpg",
         "runtime": "1h37m",
-        "ratings": ""
+        "ratings": "PG"
     },
     {
         "id": 2,
@@ -31,12 +32,13 @@
         "trailerLink": "https://youtu.be/OW6ukDwwXd8",
         "movieLink": "",
         "modernTrailerLink": "",
-        "requestedBy": {
+        "requestedBy":
+        {
             "userId": "987654321",
             "username": "gamer461",
             "platform": "Twitch"
         },
-        "category": "",
+        "category": "adventure",
         "trailerPrivate": false,
         "moviePrivate": false,
         "year": 1984,
@@ -45,7 +47,7 @@
         "voteCount": 0,
         "imageUrl": "./img/movie1.jpg",
         "runtime": "1h55m",
-        "ratings": ""
+        "ratings": "R"
     },
     {
         "id": 3,
@@ -55,7 +57,8 @@
         "trailerLink": "https://youtu.be/FXTyss9UAwM",
         "movieLink": "",
         "modernTrailerLink": "",
-        "requestedBy": {
+        "requestedBy":
+        {
             "userId": "987654322",
             "username": "gamer462",
             "platform": "Twitch"
@@ -69,7 +72,7 @@
         "voteCount": 0,
         "imageUrl": "./img/movie1.jpg",
         "runtime": "1h54m",
-        "ratings": ""
+        "ratings": "PG-13"
     },
     {
         "id": 4,
@@ -79,7 +82,8 @@
         "trailerLink": "https://youtu.be/ye4KFyWu2do",
         "movieLink": "",
         "modernTrailerLink": "",
-        "requestedBy": {
+        "requestedBy":
+        {
             "userId": "987654323",
             "username": "gamer463",
             "platform": "Twitch"
@@ -103,7 +107,8 @@
         "trailerLink": "https://youtu.be/d_vxkIm9z8k",
         "movieLink": "",
         "modernTrailerLink": "",
-        "requestedBy": {
+        "requestedBy":
+        {
             "userId": "987654324",
             "username": "gamer464",
             "platform": "Twitch"
@@ -127,7 +132,8 @@
         "trailerLink": "https://youtu.be/sJzI6qSmJoQ",
         "movieLink": "",
         "modernTrailerLink": "",
-        "requestedBy": {
+        "requestedBy":
+        {
             "userId": "987654325",
             "username": "gamer465",
             "platform": "Twitch"
@@ -151,7 +157,8 @@
         "trailerLink": "",
         "movieLink": "",
         "modernTrailerLink": "",
-        "requestedBy": {
+        "requestedBy":
+        {
             "userId": "",
             "username": "",
             "platform": ""
@@ -175,7 +182,8 @@
         "trailerLink": "",
         "movieLink": "",
         "modernTrailerLink": "",
-        "requestedBy": {
+        "requestedBy":
+        {
             "userId": "",
             "username": "",
             "platform": ""
@@ -199,7 +207,8 @@
         "trailerLink": "",
         "movieLink": "",
         "modernTrailerLink": "",
-        "requestedBy": {
+        "requestedBy":
+        {
             "userId": "",
             "username": "",
             "platform": ""
@@ -223,7 +232,8 @@
         "trailerLink": "",
         "movieLink": "",
         "modernTrailerLink": "",
-        "requestedBy": {
+        "requestedBy":
+        {
             "userId": "",
             "username": "",
             "platform": ""
