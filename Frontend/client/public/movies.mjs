@@ -149,10 +149,8 @@ function displayMovies(movieList) {
 }
 
 async function loadMovies() {
-    let movies = [];
-
     try {
-        movies = await fetchMovies();
+        const movies = await fetchMovies();
         if (movies && movies.length > 0) {
             localStorage.setItem("moviesList", JSON.stringify(movies));
             state.movies = movies;
@@ -166,7 +164,7 @@ async function loadMovies() {
     }
 
     try {
-        movies = getMoviesFromLocalStorage();
+        const movies = getMoviesFromLocalStorage();
         if (movies && movies.length > 0) {
             state.movies = movies;
             state.filteredMovies = movies; // Default filtered list
@@ -181,7 +179,7 @@ async function loadMovies() {
 // Unified fetch function with fallback
 async function fetchMovies() {
     try {
-        const response = await fetch("/movies");
+        const response = await fetch("http://localhost:3000/movies");
         if (!response.ok) throw new Error('Failed to fetch movies');
 
         console.log("📂 Fetching movies from: /movies"); // Debugging line
