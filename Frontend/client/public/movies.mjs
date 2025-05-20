@@ -1,8 +1,15 @@
+import { Pagination } from './pagination.mjs';
 import { state } from './state.mjs';
 import { showError } from './utils.mjs';
 
+const DEFAULT_PAGE_SIZE = 5;
+const MOVIES_PER_PAGE_VALUES = [1, 5, 10, 15];
+
 // Check if running in a browser environment
 const isBrowser = typeof window !== 'undefined';
+
+const paginationSection = document.getElementById('movies-pagination-section');
+const pagination = new Pagination(paginationSection, renderMoviesPage, DEFAULT_PAGE_SIZE, MOVIES_PER_PAGE_VALUES, 'movies-page-size-select');
 
 if (isBrowser) {
     document.addEventListener('DOMContentLoaded', () => {
@@ -61,7 +68,7 @@ function createMovieCardHTML(movie) {
 }
 
 // Update movie display dynamically
-function updateMovieDisplay(filteredMovies) {
+function updateMovieDisplay() {
     if (!isBrowser) return;
 
     const movieTable = document.getElementById('movie-table');
@@ -80,8 +87,18 @@ function updateMovieDisplay(filteredMovies) {
         return;
     }
 
+    pagination.setTotalItems(state.filteredMovies.length);
+    renderMoviesPage(1, DEFAULT_PAGE_SIZE);
+}
+
+function renderMoviesPage(page, pageSize) {
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const currentPageMovies = state.filteredMovies.slice(startIndex, endIndex);
+
     // Render movie cards dynamically
-    movieTable.innerHTML = state.filteredMovies.map(createMovieCardHTML).join('');
+    const movieTable = document.getElementById('movie-table');
+    movieTable.innerHTML = currentPageMovies.map(createMovieCardHTML).join('');
 }
 
 // Unified fetch function with fallback
