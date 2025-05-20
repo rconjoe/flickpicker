@@ -3,7 +3,7 @@ import { showToast } from "./utils.mjs";
 import { login, logout, isAuthenticated, initializeAuth, loadUserFromSession } from "./auth.mjs";
 import { addToPlaylist } from "./playlist.mjs";
 import { searchMovies } from "./search.mjs";
-import { displayMovies, updateMovieDisplay } from "./movies.mjs";
+import {displayMovies, handleVote, updateMovieDisplay} from "./movies.mjs";
 import { togglePasswordVisibility, updateAuthUI, closeModal, handleMovieSearch, toggleTheme } from "./ui.mjs";
 
 const isBrowser = typeof window !== "undefined";
@@ -165,21 +165,6 @@ export async function loadMovieFromFile() {
   loadMovieFromFile;
 }
 
-export function handleMovieInteraction(event) {
-  const target = event.target;
-  const movieCard = target.closest(".card");
-
-  if (!movieCard) return;
-
-  const movieId = movieCard.dataset.movieId;
-
-  if (target.classList.contains("vote-btn")) {
-    handleVote(movieId, target.dataset.vote);
-  } else if (target.classList.contains("add-to-playlist-btn")) {
-    addToPlaylist(movieId);
-  }
-}
-
 export async function updateMovieListJson(movies) {
   try {
     const response = await fetch("http://localhost:3000/update-movie-list", {
@@ -323,10 +308,6 @@ if (isBrowser)
       logoutLink.addEventListener("click", logout);
     }
 
-    const movieTable = document.getElementById("movie-table");
-    if (movieTable) {
-      movieTable.addEventListener("click", handleMovieInteraction);
-    }
   }, {once: true});
 const filterSelects = document.querySelectorAll("#filter-section select");
 if (filterSelects) {
