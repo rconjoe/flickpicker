@@ -179,7 +179,7 @@ async function loadMovies() {
 // Unified fetch function with fallback
 async function fetchMovies() {
     try {
-        const response = await fetch("http://localhost:3000/movies");
+        const response = await fetch("/movies");
         if (!response.ok) throw new Error('Failed to fetch movies');
 
         console.log("📂 Fetching movies from: /movies"); // Debugging line
