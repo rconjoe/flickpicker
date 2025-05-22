@@ -165,36 +165,6 @@ export async function loadMovieFromFile() {
   loadMovieFromFile;
 }
 
-export function handleMovieInteraction(event) {
-  const target = event.target;
-  const movieCard = target.closest(".card");
-
-  if (!movieCard) return;
-
-  const movieId = movieCard.dataset.movieId;
-
-  if (target.classList.contains("vote-btn")) {
-    handleVote(movieId, target.dataset.vote);
-  } else if (target.classList.contains("add-to-playlist-btn")) {
-    addToPlaylist(movieId);
-  }
-}
-
-export function handleVote(movieId, voteType) {
-  if (
-    !state.currentUser ||
-    !state.currentUser.id ||
-    !state.currentUser.username
-  ) {
-    showToast("Please log in to vote", "warning");
-    return;
-  }
-
-  // Implement voting logic here
-  console.log(`Vote ${voteType} for movie ${movieId}`);
-  // Update UI or make API call to record vote
-}
-
 export async function updateMovieListJson(movies) {
   try {
     const response = await fetch("http://localhost:3000/update-movie-list", {
@@ -350,10 +320,6 @@ if (isBrowser)
       logoutLink.addEventListener("click", logout);
     }
 
-    const movieTable = document.getElementById("movie-table");
-    if (movieTable) {
-      movieTable.addEventListener("click", handleMovieInteraction);
-    }
   }, {once: true});
 const filterSelects = document.querySelectorAll("#filter-section select");
 if (filterSelects) {

@@ -6,8 +6,8 @@ import { updateAuthUI, closeModal } from './ui.mjs';
 // Default test users
 // Default test users with roles
 const defaultUsers = [
-    { username: 'user1', password: 'pass1', role: 'user' },
-    { username: 'admin', password: 'admin123', role: 'admin' }
+    { id: 1, username: 'user1', password: 'pass1', role: 'user' },
+    { id: 2, username: 'admin', password: 'admin123', role: 'admin' }
 ];
 
 // Cached DOM elements for performance optimization
@@ -73,7 +73,7 @@ export async function login(username, password) {
         const user = defaultUsers.find(u => u.username === username && u.password === password);
 
         if (user) {
-            state.currentUser = { username: user.username, role: user.role };
+            state.currentUser = { username: user.username, role: user.role, id: user.id };
 
             // Save user session and role to sessionStorage
             sessionStorage.setItem('user', JSON.stringify(state.currentUser));

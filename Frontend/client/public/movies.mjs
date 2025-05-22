@@ -97,6 +97,11 @@ function renderMoviesPage(page, pageSize) {
     const currentPageMovies = state.filteredMovies.slice(startIndex, endIndex);
 
     // Render movie cards dynamically
+    movieTable.innerHTML = state.filteredMovies.map(createMovieCardHTML).join('');
+
+    document.querySelectorAll('.vote-btn').forEach(button => {
+        button.addEventListener('click', handleVote);
+    });
     const movieTable = document.getElementById('movie-table');
     movieTable.innerHTML = currentPageMovies.map(createMovieCardHTML).join('');
 }
@@ -115,6 +120,69 @@ async function fetchMovies(source = '/Data/movieList.json') {
     } catch (error) {
         console.error('Error fetching movies:', error);
         showError('Failed to fetch movies. Please try again later.');
+    }
+}
+
+// Add this function to handle votes
+async function handleVote(event) {
+    // Prevent default action if any
+    event.preventDefault();
+    
+    // Only proceed if user is logged in
+    if (!state.currentUser) {
+        console.log(state.currentUser);
+        alert('Please log in to vote');
+        return;
+    }
+    
+    const button = event.currentTarget;
+    const movieCard = button.closest('[data-movie-id]');
+    const movieId = movieCard.dataset.movieId;
+    const voteType = button.dataset.vote;
+    const voteCountElement = button.querySelector('.vote-count');
+    const currentCount = parseInt(voteCountElement.textContent) || 0;
+    voteCountElement.textContent = currentCount + 1; // "up" in this case
+    
+    try {
+        // Call the API to update vote
+        const response = await fetch(`http://localhost:3000/update-vote`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                movieId,
+                voteType,
+                userId: 1, // Replace with actual user ID, e.g., state.currentUser.id,
+            }),
+        });
+        
+        if (!response.ok) {
+            voteCountElement.textContent = currentCount;
+            throw new Error('Failed to update vote');
+        }
+        
+        const result = await response.json();
+        
+        // Update the vote count in the UI
+        const voteCountElement = button.querySelector('.vote-count');
+        voteCountElement.textContent = result.newVoteCount;
+        
+        // Update the movie in our state
+        const movieIndex = state.movies.findIndex(m => m.id == movieId);
+        if (movieIndex !== -1) {
+            state.movies[movieIndex].voteCount = result.newVoteCount;
+        }
+        
+        const filteredIndex = state.filteredMovies.findIndex(m => m.id == movieId);
+        if (filteredIndex !== -1) {
+            state.filteredMovies[filteredIndex].voteCount = result.newVoteCount;
+        }
+        
+    } catch (error) {
+        voteCountElement.textContent = currentCount;
+        console.error('Error updating vote:', error);
+        alert('Failed to update vote. Please try again.');
     }
 }
 
