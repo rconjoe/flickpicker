@@ -3,8 +3,8 @@ import { showToast } from "./utils.mjs";
 import { login, logout, isAuthenticated, initializeAuth, loadUserFromSession } from "./auth.mjs";
 import { addToPlaylist } from "./playlist.mjs";
 import { searchMovies } from "./search.mjs";
-import {displayMovies, handleVote, updateMovieDisplay} from "./movies.mjs";
-import { togglePasswordVisibility, updateAuthUI, closeModal, handleMovieSearch, toggleTheme } from "./ui.mjs";
+import { displayMovies, updateMovieDisplay } from "./movies.mjs";
+import { togglePasswordVisibility, updateAuthUI, closeModal, handleMovieSearch, toggleTheme, initTheme, getPreferredTheme, setTheme } from "./ui.mjs";
 
 const isBrowser = typeof window !== "undefined";
 const isNode = typeof window === "undefined";
@@ -238,7 +238,7 @@ if (isBrowser)
   document.addEventListener("DOMContentLoaded", function () {
     
     handleMovieSearch();
-    toggleTheme();
+    initTheme();
     togglePasswordVisibility();
     updateAuthUI();
     initializeAuth();
@@ -294,6 +294,18 @@ if (isBrowser)
       select.addEventListener("change", applyFilters);
     });
 
+    const themeToggleBtn = document.getElementById("themeToggle");
+    if (themeToggleBtn) {
+      const theme = getPreferredTheme();
+      
+      const themeBtnIcon = themeToggleBtn.querySelector("i");
+      const iconClassName = theme === "dark" ? "fa-sun" : "fa-moon";
+      themeBtnIcon.classList.remove("fa-sun", "fa-moon");
+      themeBtnIcon.classList.add("fas", iconClassName);
+
+      themeToggleBtn.addEventListener("click", toggleTheme);
+    }
+
     const loginBtn = document.getElementById("loginBtn");
     if (loginBtn) {
       loginBtn.addEventListener("click", () => {
@@ -317,6 +329,9 @@ if (filterSelects) {
 }
 
 if (isBrowser) {
+  const currentTheme = getPreferredTheme();
+  document.getElementById("themeSelector").value = currentTheme;
+
   document
     .getElementById("saveSettingsBtn")
     .addEventListener("click", function () {
@@ -330,6 +345,7 @@ if (isBrowser) {
       const theme = document.getElementById("themeSelector").value;
       const feedback = document.getElementById("feedback").value;
 
+      setTheme(theme);
       console.log({
         emailNotifications,
         discordNotifications,
