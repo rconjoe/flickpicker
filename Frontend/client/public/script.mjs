@@ -1,30 +1,12 @@
-import { state } from "./state.mjs";
-import { showToast } from "./utils.mjs";
 import { login, logout, isAuthenticated, initializeAuth, loadUserFromSession } from "./auth.mjs";
-import { addToPlaylist } from "./playlist.mjs";
 import { searchMovies } from "./search.mjs";
-import { displayMovies, updateMovieDisplay } from "./movies.mjs";
 import { togglePasswordVisibility, updateAuthUI, closeModal, handleMovieSearch, toggleTheme, initTheme, getPreferredTheme, setTheme } from "./ui.mjs";
+import { displayMovies, updateMovieDisplay } from "./movies.mjs";
 
 const isBrowser = typeof window !== "undefined";
 const isNode = typeof window === "undefined";
 
-const movies = isBrowser
-  ? localStorage.getItem("movieList")
-    ? JSON.parse(localStorage.getItem("movieList"))
-    : []
-  : [];
-
-const movieList = isNode
-  ? require("./movie-database").getMovies() // Example: Fetch movies from Node.js database
-  : localStorage.getItem("movieList")
-    ? JSON.parse(localStorage.getItem("movieList"))
-    : [];
-
 if (isBrowser) {
-  // Initial display (show all movies on page load)
-  displayMovies(movies);
-
   // Event listener for search input
   searchMovies();
 
@@ -70,13 +52,13 @@ export function sortMovies(criteria) {
 }
 
 export async function saveMovie(event) {
-  event.preventDefault(); // Prevent form submission
+  event.preventDefault();
   console.log("saveMovie function triggered");
   const form = document.getElementById("add-movie-form");
   const formData = new FormData(form);
 
   const movieData = {
-    id: Date.now(), // Generate unique ID
+    id: Date.now(),
     title: formData.get("title"),
     dateWatched: formData.get("dateWatched"),
     watched: false,
@@ -115,7 +97,7 @@ export async function saveMovie(event) {
     }
 
     alert("Movie saved successfully!");
-    form.reset(); // Reset the form
+    form.reset();
   } catch (error) {
     console.error("Error saving movie:", error);
     alert("Failed to save movie. Please try again.");
@@ -139,14 +121,12 @@ export async function loadMovieFromFile() {
         throw new Error("Invalid file format. Expected an array of movies.");
       }
 
-      // Validate each movie object
       for (const movie of movies) {
         if (!validateMovieData(movie)) {
           throw new Error(`Invalid movie data: ${JSON.stringify(movie)}`);
         }
       }
 
-      // Update the state and UI
       state.movies = movies;
       state.filteredMovies = [...state.movies];
       updateMovieDisplay();
@@ -162,7 +142,6 @@ export async function loadMovieFromFile() {
     alert("Error reading file. Please try again.");
   };
   reader.readAsText(file);
-  loadMovieFromFile;
 }
 
 export async function updateMovieListJson(movies) {
@@ -179,7 +158,6 @@ export async function updateMovieListJson(movies) {
       throw new Error("Failed to update movie list");
     }
 
-    // Parse the response to get any returned data
     const data = await response.json();
 
     console.log("Movie list updated successfully:", data.message);
@@ -191,24 +169,24 @@ export async function updateMovieListJson(movies) {
 
 export function validateMovieData(data) {
   return (
-    data.title && // Title is required
-    data.year && // Year is required
-    data.category && // Category is required
-    data.requestedBy.username && // Requested By username is required
-    data.language && // Language is required
-    data.trailerLink && // Trailer Link is required
-    data.movieLink && // Movie Link is required
-    data.modernTrailerLink && // Modern Trailer Link is required
-    data.dateWatched && // Date Watched is required
-    data.imdbLink && // IMDB Link is required
-    data.tmdbLink && // TMDB Link is required
-    !isNaN(data.year) && // Year should be a number
-    typeof data.subtitles === "boolean" // Subtitles should be boolean
+    data.title &&
+    data.year &&
+    data.category &&
+    data.requestedBy.username &&
+    data.language &&
+    data.trailerLink &&
+    data.movieLink &&
+    data.modernTrailerLink &&
+    data.dateWatched &&
+    data.imdbLink &&
+    data.tmdbLink &&
+    !isNaN(data.year) &&
+    typeof data.subtitles === "boolean"
   );
 }
 
 export function isValidUrl(string) {
-  if (!string) return true; // Allow empty strings
+  if (!string) return true;
   try {
     new URL(string);
     return true;
@@ -234,9 +212,8 @@ if (isBrowser && "serviceWorker" in navigator) {
   });
 }
 
-if (isBrowser)
+if (isBrowser) {
   document.addEventListener("DOMContentLoaded", function () {
-    
     handleMovieSearch();
     initTheme();
     togglePasswordVisibility();
@@ -244,16 +221,6 @@ if (isBrowser)
     initializeAuth();
     loadUserFromSession();
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const form = document.getElementById("add-movie-form");
-      if (form) {
-        form.addEventListener("submit", saveMovie);
-      } else {
-        console.error("Form with id 'add-movie-form' not found.");
-      }
-    });
-    
-    // Settings modal
     const settingsLink = document.getElementById("settingsLink");
     if (settingsLink) {
       settingsLink.addEventListener("click", function (e) {
@@ -265,7 +232,6 @@ if (isBrowser)
       });
     }
 
-    // Profile modal
     const profileLink = document.getElementById("profileLink");
     if (profileLink) {
       profileLink.addEventListener("click", function (e) {
@@ -277,19 +243,16 @@ if (isBrowser)
       });
     }
 
-    // Add movie button visibility
     const addMovieButton = document.getElementById("addMovieButton");
     if (addMovieButton) {
       try {
         addMovieButton.style.display = isAuthenticated() ? "block" : "none";
       } catch (error) {
         console.error("Error checking authentication:", error);
-        addMovieButton.style.display = "none"; // Default to hiding the button
+        addMovieButton.style.display = "none";
       }
     }
 
-    // Event listeners for filters, login, and movie interactions
-    // Initialize event listeners for filters, login, and movie interactions
     document.querySelectorAll("#filter-section select").forEach((select) => {
       select.addEventListener("change", applyFilters);
     });
@@ -297,12 +260,10 @@ if (isBrowser)
     const themeToggleBtn = document.getElementById("themeToggle");
     if (themeToggleBtn) {
       const theme = getPreferredTheme();
-      
       const themeBtnIcon = themeToggleBtn.querySelector("i");
       const iconClassName = theme === "dark" ? "fa-sun" : "fa-moon";
       themeBtnIcon.classList.remove("fa-sun", "fa-moon");
       themeBtnIcon.classList.add("fas", iconClassName);
-
       themeToggleBtn.addEventListener("click", toggleTheme);
     }
 
@@ -319,46 +280,33 @@ if (isBrowser)
     if (logoutLink) {
       logoutLink.addEventListener("click", logout);
     }
-
-  }, {once: true});
-const filterSelects = document.querySelectorAll("#filter-section select");
-if (filterSelects) {
-  filterSelects.forEach((select) => {
-    select.addEventListener("change", applyFilters);
-  });
+  }, { once: true });
 }
 
 if (isBrowser) {
   const currentTheme = getPreferredTheme();
   document.getElementById("themeSelector").value = currentTheme;
 
-  document
-    .getElementById("saveSettingsBtn")
-    .addEventListener("click", function () {
-      const emailNotifications =
-        document.getElementById("emailNotifications").checked;
-      const discordNotifications = document.getElementById(
-        "discordNotifications"
-      ).checked;
-      const voteLimit = document.getElementById("voteLimit").value;
-      const votingDeadline = document.getElementById("votingDeadline").value;
-      const theme = document.getElementById("themeSelector").value;
-      const feedback = document.getElementById("feedback").value;
+  document.getElementById("saveSettingsBtn").addEventListener("click", function () {
+    const emailNotifications = document.getElementById("emailNotifications").checked;
+    const discordNotifications = document.getElementById("discordNotifications").checked;
+    const voteLimit = document.getElementById("voteLimit").value;
+    const votingDeadline = document.getElementById("votingDeadline").value;
+    const theme = document.getElementById("themeSelector").value;
+    const feedback = document.getElementById("feedback").value;
 
-      setTheme(theme);
-      console.log({
-        emailNotifications,
-        discordNotifications,
-        voteLimit,
-        votingDeadline,
-        theme,
-        feedback,
-      });
-
-      window.bootstrap.Modal.getInstance(
-        document.getElementById("settingsModal")
-      );
+    setTheme(theme);
+    console.log({
+      emailNotifications,
+      discordNotifications,
+      voteLimit,
+      votingDeadline,
+      theme,
+      feedback,
     });
 
+    window.bootstrap.Modal.getInstance(
+      document.getElementById("settingsModal")
+    );
+  });
 }
-

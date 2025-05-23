@@ -1,26 +1,84 @@
 import { state } from './state.mjs';
-import { showError } from './utils.mjs';
+import { showError, showToast } from './utils.mjs';
+import { addToPlaylist } from './playlist.mjs';
 import { Pagination } from './pagination.mjs';
 
 const DEFAULT_PAGE_SIZE = 5;
 const MOVIES_PER_PAGE_VALUES = [1, 5, 10, 15];
 
-// Check if running in a browser environment
-const isBrowser = typeof window !== 'undefined';
+// Cache DOM elements
+const cachedElements = {
+    movieTable: document.getElementById('movie-table'),
+};
 
-const paginationSection = document.getElementById('movies-pagination-section');
-const pagination = new Pagination(paginationSection, renderMoviesPage, DEFAULT_PAGE_SIZE, MOVIES_PER_PAGE_VALUES, 'movies-page-size-select');
+document.addEventListener('DOMContentLoaded', () => {
+    // Load the full movie list on initial page load
+    loadMovies();
 
-if (isBrowser) {
-    document.addEventListener('DOMContentLoaded', () => {
-        // Load the full movie list on initial page load
-        fetchMovies();
+    // Event listener for adding movie form submission
+    const form = document.getElementById("add-movie-form");
+    if (form) {
+        form.addEventListener("submit", saveMovie);
+    } else {
+        console.error("Form with id 'add-movie-form' not found.");
+    }
+
+    // Add movie button visibility
+    const addMovieButton = document.getElementById("addMovieButton");
+    if (addMovieButton) {
+        try {
+            addMovieButton.style.display = isAuthenticated() ? "block" : "none";
+        } catch (error) {
+            console.error("Error checking authentication:", error);
+            addMovieButton.style.display = "none";
+        }
+    }
+
+    // Initialize event listeners for filters
+    document.querySelectorAll("#filter-section select").forEach((select) => {
+        select.addEventListener("change", applyFilters);
     });
+
+    const paginationSection = document.getElementById('movies-pagination-section');
+    const pagination = new Pagination(paginationSection, renderMoviesPage, DEFAULT_PAGE_SIZE, MOVIES_PER_PAGE_VALUES, 'movies-page-size-select');
+
+    if (cachedElements.movieTable) {
+        cachedElements.movieTable.addEventListener("click", handleMovieInteraction);
+    }
+}, { once: true });
+
+function handleMovieInteraction(event) {
+    const target = event.target;
+    const movieCard = target.closest(".card");
+
+    if (!movieCard) return;
+
+    const movieId = movieCard.dataset.movieId;
+
+    if (target.classList.contains("vote-btn")) {
+        handleVote(movieId, target.dataset.vote);
+    } else if (target.classList.contains("add-to-playlist-btn")) {
+        addToPlaylist(movieId);
+    }
+}
+
+function handleVote(movieId, voteType) {
+    if (
+        !state.currentUser ||
+        !state.currentUser.id ||
+        !state.currentUser.username
+    ) {
+        showToast("Please log in to vote", "warning");
+        return;
+    }
+
+    console.log(`Vote ${voteType} for movie ${movieId}`);
+    // Update UI or make API call to record vote
 }
 
 // Helper function to create movie card HTML
 function createMovieCardHTML(movie) {
-    const fallbackImage = ''; // '/path/to/default.jpg';
+    const fallbackImage = '';
     return `
         <div class="col">
             <div class="card h-100" data-movie-id="${movie.id}">
@@ -69,130 +127,13 @@ function createMovieCardHTML(movie) {
 
 // Update movie display dynamically
 function updateMovieDisplay() {
-    if (!isBrowser) return;
+    if (typeof window === 'undefined') return;
 
     const movieTable = document.getElementById('movie-table');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
 
-    // Hide loading placeholder
     if (loadingPlaceholder) loadingPlaceholder.style.display = 'none';
 
-    // Show fallback message if no movies are found
     if (!state.filteredMovies || state.filteredMovies.length === 0) {
         movieTable.innerHTML = `
-            <div class="col-12 text-center">
-                <p>No movies found matching your criteria.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    pagination.setTotalItems(state.filteredMovies.length);
-    renderMoviesPage(1, DEFAULT_PAGE_SIZE);
-}
-
-function renderMoviesPage(page, pageSize) {
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const currentPageMovies = state.filteredMovies.slice(startIndex, endIndex);
-
-    // Render movie cards dynamically
-    movieTable.innerHTML = state.filteredMovies.map(createMovieCardHTML).join('');
-
-    document.querySelectorAll('.vote-btn').forEach(button => {
-        button.addEventListener('click', handleVote);
-    });
-    const movieTable = document.getElementById('movie-table');
-    movieTable.innerHTML = currentPageMovies.map(createMovieCardHTML).join('');
-}
-
-// Unified fetch function with fallback
-async function fetchMovies(source = '/Data/movieList.json') {
-    try {
-        const response = await fetch(source);
-        if (!response.ok) throw new Error('Failed to fetch movies');
-
-        console.log('📂 Fetching movies from:', source); // Debugging line
-        const movies = await response.json();
-        state.movies = movies;
-        state.filteredMovies = [...movies]; // Default filtered list
-        updateMovieDisplay(); // Update UI after fetching
-    } catch (error) {
-        console.error('Error fetching movies:', error);
-        showError('Failed to fetch movies. Please try again later.');
-    }
-}
-
-// Add this function to handle votes
-async function handleVote(event) {
-    // Prevent default action if any
-    event.preventDefault();
-    
-    // Only proceed if user is logged in
-    if (!state.currentUser) {
-        console.log(state.currentUser);
-        alert('Please log in to vote');
-        return;
-    }
-    
-    const button = event.currentTarget;
-    const movieCard = button.closest('[data-movie-id]');
-    const movieId = movieCard.dataset.movieId;
-    const voteType = button.dataset.vote;
-    const voteCountElement = button.querySelector('.vote-count');
-    const currentCount = parseInt(voteCountElement.textContent) || 0;
-    voteCountElement.textContent = currentCount + 1; // "up" in this case
-    
-    try {
-        // Call the API to update vote
-        const response = await fetch(`http://localhost:3000/update-vote`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                movieId,
-                voteType,
-                userId: 1, // Replace with actual user ID, e.g., state.currentUser.id,
-            }),
-        });
-        
-        if (!response.ok) {
-            voteCountElement.textContent = currentCount;
-            throw new Error('Failed to update vote');
-        }
-        
-        const result = await response.json();
-        
-        // Update the vote count in the UI
-        const voteCountElement = button.querySelector('.vote-count');
-        voteCountElement.textContent = result.newVoteCount;
-        
-        // Update the movie in our state
-        const movieIndex = state.movies.findIndex(m => m.id == movieId);
-        if (movieIndex !== -1) {
-            state.movies[movieIndex].voteCount = result.newVoteCount;
-        }
-        
-        const filteredIndex = state.filteredMovies.findIndex(m => m.id == movieId);
-        if (filteredIndex !== -1) {
-            state.filteredMovies[filteredIndex].voteCount = result.newVoteCount;
-        }
-        
-    } catch (error) {
-        voteCountElement.textContent = currentCount;
-        console.error('Error updating vote:', error);
-        alert('Failed to update vote. Please try again.');
-    }
-}
-
-// Explicit function to display movies (wrapper around updateMovieDisplay)
-function displayMovies(movieList) {
-    if (!isBrowser) return;
-    state.filteredMovies = movieList;
-    updateMovieDisplay(movieList);
-}
-
-
-// Export module functions, including displayMovies
-export { createMovieCardHTML, updateMovieDisplay, fetchMovies, displayMovies };
+            <div class="col-12 text
