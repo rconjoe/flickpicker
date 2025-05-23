@@ -1,7 +1,7 @@
 import { state } from './state.mjs';
 import { showError, showToast } from './utils.mjs';
 import { addToPlaylist } from './playlist.mjs';
-import { Pagination, renderMoviesPage} from './pagination.mjs';
+import { Pagination} from './pagination.mjs';
 import { isAuthenticated } from './auth.mjs';
 
 const DEFAULT_PAGE_SIZE = 5;
@@ -314,5 +314,12 @@ function validateMovieData(data) {
   );
 }
 
+function renderMoviesPage(page, pageSize) {
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    const pageItems = state.filteredMovies.slice(start, end);
+    displayMovies(pageItems);
+}
+
 // Export module functions, including displayMovies
-export { createMovieCardHTML, updateMovieDisplay, displayMovies, saveMovie };
+export { createMovieCardHTML, updateMovieDisplay, displayMovies, saveMovie, renderMoviesPage };
