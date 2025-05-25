@@ -34,7 +34,7 @@ If you encounter a bug:
    - A clear and descriptive title.
    - Steps to reproduce the issue.
    - Expected and actual behavior.
-   - Screenshots or logs, if applicable.
+   - Screenshots, logs or short video, if applicable.
 
 ### Suggesting Features
 
@@ -50,23 +50,31 @@ We welcome feature requests! To suggest a feature:
 
 To contribute code:
 
-1. Fork the repository and clone it locally.
-2. Create a new branch for your changes:
+1. Fork the repository on GitHub (this creates your own copy of the project under your GitHub account).
+
+2. Clone your fork locally:
+
+   ```bash
+   git clone https://github.com/your-username/flickpicker.git
+   cd flickpicker
+   ```
+
+3. Create a new branch for your changes:
 
    ```bash
    git checkout -b feature/your-feature-name
    ```
-3. Make your changes and commit them with a clear, descriptive message:
+4. Make your changes and commit them with a clear, descriptive message:
 
    ```bash
    git commit -m "Add feature: your-feature-name"
    ```
-4. Push your branch to your fork:
+5. Push your branch to your forked repository:
 
    ```bash
    git push origin feature/your-feature-name
    ```
-5. Open a Pull Request (PR) to the main branch of the original repository. Be sure to include:
+6. Open a Pull Request (PR) to the main branch of the original repository. Be sure to include:
    - A clear title and description of your changes.
    - Any relevant issue numbers (e.g., Closes #123).
 
@@ -76,41 +84,42 @@ To contribute code:
 
 1. Navigate to the Backend directory:
 
-```bash
-cd Backend
-```
+    ```bash
+    cd Backend
+    ```
 
 2. Install dependencies:
+  
+    ```bash
+    npm i or npm install
+    ```
 
-```bash
-npm install
-```
+3. Start the backend server (which also serves the frontend):
 
-3. Start the backend server:
-
-```bash
-npm start
-```
+    ```bash
+    npm start or npm run start
+    ```
 
 ### Frontend
 
 1. Navigate to the Frontend/client directory:
 
-```bash
-cd Frontend/client
-```
+    ```bash
+    cd Frontend/client
+    ```
 
 2. Install dependencies:
 
-```bash
-npm install
-```
+     ```bash
+     npm i or npm install
+     ```
 
-3. Serve the frontend using a static file server or development server (e.g., with Vite, React, or Next.js):
+3. You do not need to run the frontend separately. The Express backend serves the frontend.
 
-```bash
-npm start
-```
+4. Once the backend server is running, open your browser and go to
+     ```bash
+   http://localhost:3000
+   ```
 
 ## Style Guide
 
