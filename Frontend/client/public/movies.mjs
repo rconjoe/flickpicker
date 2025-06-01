@@ -144,7 +144,7 @@ function updateMovieDisplay(resetFilteredMovies) {
     // Render movie cards dynamically
     movieTable.innerHTML = state.filteredMovies.map(createMovieCardHTML).join('');
 
-    // If required, reset `state.filteredMovies` to immediately previous value
+    // @hugolopez-online: If required, reset `state.filteredMovies` to immediately previous value
     if (resetFilteredMovies) state.filteredMovies = resetFilteredMovies;
 }
 
