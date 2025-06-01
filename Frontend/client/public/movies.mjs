@@ -40,9 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
         select.addEventListener("change", applyFilters);
     });
 
-    const paginationSection = document.getElementById('movies-pagination-section');
-    const pagination = new Pagination(paginationSection, renderMoviesPage, DEFAULT_PAGE_SIZE, MOVIES_PER_PAGE_VALUES, 'movies-page-size-select');
-
     if (cachedElements.movieTable) {
         cachedElements.movieTable.addEventListener("click", handleMovieInteraction);
     }
@@ -127,7 +124,7 @@ function createMovieCardHTML(movie) {
 }
 
 // Update movie display dynamically
-function updateMovieDisplay() {
+function updateMovieDisplay(resetFilteredMovies) {
     const movieTable = document.getElementById('movie-table');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
 
@@ -146,12 +143,21 @@ function updateMovieDisplay() {
 
     // Render movie cards dynamically
     movieTable.innerHTML = state.filteredMovies.map(createMovieCardHTML).join('');
+
+    // If required, reset `state.filteredMovies` to immediately previous value
+    if (resetFilteredMovies) state.filteredMovies = resetFilteredMovies;
 }
 
 // Explicit function to display movies (wrapper around updateMovieDisplay)
-function displayMovies(movieList) {
+/* @hugolopez-online: Parameter `unfilteredList` implemented
+to keep track of previous state.filteredMovies if necessary
+(e.g: on pagination size change, to preserve data source consistent).
+Set to false by default to not intervene with other filtering functions if not provided.
+Please note that, in turn, to track this properly, a parameter `resetFilteredMovies` was set
+in `updateMovieDisplay` function definition. */
+function displayMovies(movieList, unfilteredList = false) {
     state.filteredMovies = movieList;
-    updateMovieDisplay(movieList);
+    updateMovieDisplay(unfilteredList);
 }
 
 async function loadMovies() {
@@ -163,7 +169,10 @@ async function loadMovies() {
             localStorage.setItem("moviesList", JSON.stringify(movies));
             state.movies = movies;
             state.filteredMovies = movies; // Default filtered list
-            updateMovieDisplay(); // Update UI after fetching
+            const paginationSection = document.getElementById('movies-pagination-section');
+            const pagination = new Pagination(paginationSection, renderMoviesPage, DEFAULT_PAGE_SIZE, MOVIES_PER_PAGE_VALUES, "movie-page-size-select"); // @hugolopez-online: moved to this block to properly await movies data loading
+            pagination.setTotalItems(state.filteredMovies.length) // @hugolopez-online: Sets pagination micro-service accordingly
+            renderMoviesPage(1, DEFAULT_PAGE_SIZE); // @hugolopez-online: Renders correct movie card amount on first page load (this function eventually calls `updateMovieDisplay()`, so that's why it's been removed from this block)
             return;
         }
     } catch (error) {
@@ -318,7 +327,7 @@ function renderMoviesPage(page, pageSize) {
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     const pageItems = state.filteredMovies.slice(start, end);
-    displayMovies(pageItems);
+    displayMovies(pageItems, state.filteredMovies);
 }
 
 // Export module functions, including displayMovies
