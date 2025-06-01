@@ -124,7 +124,7 @@ function createMovieCardHTML(movie) {
 }
 
 // Update movie display dynamically
-function updateMovieDisplay(resetFilteredMovies) {
+function updateMovieDisplay(resetFilteredMovies = false) {
     const movieTable = document.getElementById('movie-table');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
 
