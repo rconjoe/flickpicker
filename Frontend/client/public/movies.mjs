@@ -124,7 +124,7 @@ function createMovieCardHTML(movie) {
 }
 
 // Update movie display dynamically
-function updateMovieDisplay(resetFilteredMovies = false) {
+function updateMovieDisplay(previousFilteredMovies = null) {
     const movieTable = document.getElementById('movie-table');
     const loadingPlaceholder = document.getElementById('loading-placeholder');
 
@@ -145,19 +145,19 @@ function updateMovieDisplay(resetFilteredMovies = false) {
     movieTable.innerHTML = state.filteredMovies.map(createMovieCardHTML).join('');
 
     // @hugolopez-online: If required, reset `state.filteredMovies` to immediately previous value
-    if (resetFilteredMovies) state.filteredMovies = resetFilteredMovies;
+    if (previousFilteredMovies) state.filteredMovies = previousFilteredMovies;
 }
 
 // Explicit function to display movies (wrapper around updateMovieDisplay)
-/* @hugolopez-online: Parameter `unfilteredList` implemented
-to keep track of previous state.filteredMovies if necessary
+/* @hugolopez-online: Parameter `previousFilteredMovies` implemented
+to keep track of previous `state.filteredMovies` if necessary
 (e.g: on pagination size change, to preserve data source consistent).
-Set to false by default to not intervene with other filtering functions if not provided.
-Please note that, in turn, to track this properly, a parameter `resetFilteredMovies` was set
+Set to `null` by default to not intervene with other filtering functions if not required, hence not provided.
+Please note that, in turn, to track this properly, a parameter with the same name was set
 in `updateMovieDisplay` function definition. */
-function displayMovies(movieList, unfilteredList = false) {
+function displayMovies(movieList, previousFilteredMovies = null) {
     state.filteredMovies = movieList;
-    updateMovieDisplay(unfilteredList);
+    updateMovieDisplay(previousFilteredMovies);
 }
 
 async function loadMovies() {
