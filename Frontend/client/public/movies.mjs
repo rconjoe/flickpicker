@@ -144,17 +144,11 @@ function updateMovieDisplay(previousFilteredMovies = null) {
     // Render movie cards dynamically
     movieTable.innerHTML = state.filteredMovies.map(createMovieCardHTML).join('');
 
-    // @hugolopez-online: If required, reset `state.filteredMovies` to immediately previous value
+    // If required and provided, set `state.filteredMovies` to previous value
     if (previousFilteredMovies) state.filteredMovies = previousFilteredMovies;
 }
 
 // Explicit function to display movies (wrapper around updateMovieDisplay)
-/* @hugolopez-online: Parameter `previousFilteredMovies` implemented
-to keep track of previous `state.filteredMovies` if necessary
-(e.g: on pagination size change, to preserve data source consistent).
-Set to `null` by default to not intervene with other filtering functions if not required, hence not provided.
-Please note that, in turn, to track this properly, a parameter with the same name was set
-in `updateMovieDisplay` function definition. */
 function displayMovies(movieList, previousFilteredMovies = null) {
     state.filteredMovies = movieList;
     updateMovieDisplay(previousFilteredMovies);
@@ -170,9 +164,9 @@ async function loadMovies() {
             state.movies = movies;
             state.filteredMovies = movies; // Default filtered list
             const paginationSection = document.getElementById('movies-pagination-section');
-            const pagination = new Pagination(paginationSection, renderMoviesPage, DEFAULT_PAGE_SIZE, MOVIES_PER_PAGE_VALUES, "movie-page-size-select"); // @hugolopez-online: moved to this block to properly await movies data loading
-            pagination.setTotalItems(state.filteredMovies.length) // @hugolopez-online: Sets pagination micro-service accordingly
-            renderMoviesPage(1, DEFAULT_PAGE_SIZE); // @hugolopez-online: Renders correct movie card amount on first page load (this function eventually calls `updateMovieDisplay()`, so that's why it's been removed from this block)
+            const pagination = new Pagination(paginationSection, renderMoviesPage, DEFAULT_PAGE_SIZE, MOVIES_PER_PAGE_VALUES, "movie-page-size-select"); // Initiates pagination once movie data has been successfully fetched
+            pagination.setTotalItems(state.filteredMovies.length) // Passes down amount of movies fetched for proper pagination setup
+            renderMoviesPage(1, DEFAULT_PAGE_SIZE); // Renders default movie card amount on first page load
             return;
         }
     } catch (error) {
