@@ -1,39 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router'
-import logo from '../logo.svg'
+import MovieGrid from '@/components/MovieGrid'
+
+// environment variables with vite work like this
+// https://vite.dev/guide/env-and-mode
+const api_url = import.meta.env.VITE_API_URL
 
 export const Route = createFileRoute('/')({
   component: App,
+  loader: () => fetchMovies(),
 })
 
+async function fetchMovies() {
+  const res = await fetch(`${api_url}/movies`)
+  if (!res.ok) throw new Error('failed to fetch movies')
+  return res.json()
+}
+
 function App() {
+  const movies = Route.useLoaderData()
   return (
     <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/routes/index.tsx</code> and save to reload.
-        </p>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
+      <div className="min-h-screen p-4 items-center justify-center text-white">
+        <MovieGrid movies={movies} />
+      </div>
     </div>
   )
 }
