@@ -162,8 +162,11 @@ function displayMovies(movieList, previousFilteredMovies = null) {
 
 async function loadMovies() {
     let movies = [];
-
+    const spinner = document.getElementById('loading-spinner');
+    const movieTable = document.getElementById('movie-table');
     try {
+        if (spinner) spinner.style.display = 'inline-block';
+        if (movieTable) movieTable.style.display = 'none';
         movies = await fetchMovies();
         if (movies && movies.length > 0) {
             localStorage.setItem("moviesList", JSON.stringify(movies));
@@ -178,6 +181,10 @@ async function loadMovies() {
     } catch (error) {
         console.error('Error fetching movies:', error);
         showToast('Failed to fetch movies. Please try again later.', 'error');
+     }finally {
+    //     // Hide spinner and show movie table
+        if (spinner) spinner.style.display = 'none';
+        if (movieTable) movieTable.style.display = 'flex';
     }
 
     try {
